@@ -141,7 +141,7 @@
                     </div>
                 </div>
 
-            @elseif (array_filter($criteria))
+          @elseif (array_filter($criteria))
                 <div class="rounded-2xl border border-amber-200 bg-amber-50 p-10 text-center">
                     <div class="w-16 h-16 mx-auto bg-amber-100 rounded-full flex items-center justify-center text-2xl mb-4">⚠️</div>
                     <p class="font-bold text-amber-900 text-lg">Tidak ada kecocokan tinggi</p>
@@ -152,22 +152,121 @@
                     </a>
                 </div>
             @else
-                <div class="rounded-2xl border-2 border-dashed border-[#E5E7EB] bg-white p-10 text-center">
-                    <div class="w-16 h-16 mx-auto bg-white border border-[#E5E7EB] rounded-2xl flex items-center justify-center text-2xl shadow-sm mb-4">📊</div>
-                    <p class="font-bold text-[#111827] text-lg">Belum Ada Hasil</p>
-                    <p class="mt-2 text-sm text-[#6B7280] max-w-sm mx-auto">Kamu belum menjalankan analisis. Mulai sekarang untuk melihat rekomendasi karir.</p>
-                    <a href="{{ route('analysis.form') }}"
-                       class="mt-5 inline-flex items-center gap-2 bg-[#F5A524] hover:bg-[#D98D0F] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
-                        Mulai Analisis
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
-                    </a>
+                @if(isset($histories) && $histories->count() > 0)
+                    {{-- 1. Tampilan kalau user buka menu dari sidebar tapi udah punya histori --}}
+                    <div class="rounded-2xl border border-blue-200 bg-[#EEF1FB] p-6 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
+                        <div class="w-12 h-12 shrink-0 bg-white rounded-full flex items-center justify-center text-xl shadow-sm border border-blue-100">💡</div>
+                        <div>
+                            <p class="font-bold text-[#1A2B6B] text-lg">Siap untuk analisis baru?</p>
+                            <p class="text-sm text-[#374151] mt-1">Kamu belum menjalankan analisis di sesi ini. Klik tombol <b>"Ubah Pencarian"</b> di pojok kanan atas untuk memasukkan skill baru, atau lihat riwayat analisismu di bawah.</p>
+                        </div>
+                    </div>
+                @else
+                    {{-- Tampilan asli kalau user beneran belum pernah analisis sama sekali --}}
+                    <div class="rounded-2xl border-2 border-dashed border-[#E5E7EB] bg-white p-10 text-center">
+                        <div class="w-16 h-16 mx-auto bg-white border border-[#E5E7EB] rounded-2xl flex items-center justify-center text-2xl shadow-sm mb-4">📊</div>
+                        <p class="font-bold text-[#111827] text-lg">Belum Ada Hasil</p>
+                        <p class="mt-2 text-sm text-[#6B7280] max-w-sm mx-auto">Kamu belum menjalankan analisis. Mulai sekarang untuk melihat rekomendasi karir.</p>
+                        <a href="{{ route('analysis.form') }}"
+                           class="mt-5 inline-flex items-center gap-2 bg-[#F5A524] hover:bg-[#D98D0F] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
+                            Mulai Analisis
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                @endif
+            @endif
+
+            {{-- 2. Menampilkan Kriteria di Kotak Riwayat --}}
+            @if(isset($histories) && $histories->count() > 0)
+                <div class="pt-8 mt-8 border-t border-[#E5E7EB]">
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-8 h-8 rounded-full bg-[#EEF1FB] flex items-center justify-center text-[#1A2B6B]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-[#111827]">Riwayat Analisis Kamu</h3>
+                    </div>
+                    
+                    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        @foreach ($histories as $history)
+                            @php
+                                $topHistory = $history->results[0] ?? null;
+                                $hCriteria = $history->criteria ?? [];
+                            @endphp
+                            <div class="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm hover:border-[#C7D0EE] hover:shadow-md transition group relative overflow-hidden flex flex-col">
+                                <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-[#F5F7FA] to-[#EEF1FB] rounded-bl-full pointer-events-none -z-10 group-hover:scale-110 transition-transform"></div>
+                                
+                                <div class="text-xs font-bold text-[#6B7280] mb-3">
+                                    {{ $history->created_at->format('d M Y • H:i') }}
+                                </div>
+                                
+                                @if($topHistory)
+                                    <div class="text-xs text-[#6B7280] mb-1">Rekomendasi Tertinggi:</div>
+                                    <h4 class="font-extrabold text-[#111827] text-base truncate">{{ $topHistory['career_name'] }}</h4>
+                                    
+                                    <div class="mt-2 mb-4 flex items-center gap-2">
+                                        <div class="flex-1 h-1.5 bg-[#F5F7FA] rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full {{ $topHistory['score'] >= 80 ? 'bg-emerald-500' : 'bg-[#1A2B6B]' }}" style="width: {{ $topHistory['score'] }}%"></div>
+                                        </div>
+                                        <span class="text-xs font-extrabold {{ $topHistory['score'] >= 80 ? 'text-emerald-600' : 'text-[#1A2B6B]' }}">
+                                            {{ number_format($topHistory['score'], 1) }}%
+                                        </span>
+                                    </div>
+                                @else
+                                    <div class="text-sm text-[#6B7280] italic mt-2 mb-4">Tidak ada hasil kecocokan</div>
+                                @endif
+
+                                {{-- Menampilkan Kriteria di Bawah Card --}}
+                                <div class="mt-auto pt-3 border-t border-gray-100">
+                                    <p class="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">Kriteria:</p>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        @if (!empty($hCriteria['education_id']))
+                                            @php $edu = collect($educations)->firstWhere('education_id', $hCriteria['education_id']); @endphp
+                                            @if ($edu)
+                                                <span class="inline-flex items-center bg-[#EEF1FB] text-[#1A2B6B] border border-[#C7D0EE] text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                                    🎓 {{ $edu->education_level }}
+                                                </span>
+                                            @endif
+                                        @endif
+                                        
+                                        @foreach (($hCriteria['skill_ids'] ?? []) as $sid)
+                                            @php $sk = collect($skills)->firstWhere('skill_id', $sid); @endphp
+                                            @if ($sk)
+                                                <span class="inline-flex items-center bg-orange-50 text-orange-700 border border-orange-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                                    ⚡ {{ $sk->skill_name }}
+                                                </span>
+                                            @endif
+                                        @endforeach
+
+                                        @foreach (($hCriteria['specialization_ids'] ?? []) as $spid)
+                                            @php $sp = collect($specializations)->firstWhere('specialization_id', $spid); @endphp
+                                            @if ($sp)
+                                                <span class="inline-flex items-center bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                                    🎯 {{ $sp->specialization_name }}
+                                                </span>
+                                            @endif
+                                        @endforeach
+
+                                        @if (!empty($hCriteria['certification_id']))
+                                            @php $cert = collect($certifications)->firstWhere('certification_id', $hCriteria['certification_id']); @endphp
+                                            @if ($cert)
+                                                <span class="inline-flex items-center bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                                    📜 {{ $cert->certification_name }}
+                                                </span>
+                                            @endif
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             @endif
 
         </main>
-    </div>
 
     <script>
         const bars = document.querySelectorAll('.score-bar-fill[data-target]');

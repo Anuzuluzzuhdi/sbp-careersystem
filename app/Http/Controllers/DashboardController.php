@@ -74,11 +74,33 @@ class DashboardController extends Controller
                     });
             }
         }
+// --- KODE BARU: Menyimpan histori ke database ---
+        if ($hasCriteria && $searchResults->isNotEmpty()) {
+            // Kita simpan nama karir dan skor kecocokannya saja agar rapi
+            $historyResults = $searchResults->map(function($item) {
+                return [
+                    'career_name' => $item->career_name,
+                    'score' => $item->score
+                ];
+            })->toArray();
+
+            // Perintah untuk memasukkan data ke tabel analysis_histories
+            \App\Models\AnalysisHistory::create([
+                'user_id' => auth()->id(),
+                'criteria' => $criteria,
+                'results' => $historyResults
+            ]);
+        }
+        // --- AKHIR KODE BARU ---
+
+       $histories = \App\Models\AnalysisHistory::where('user_id', auth()->id())
+                        ->orderBy('created_at', 'desc')
+                        ->get();
 
         return view('analysis.result', compact(
             'careers', 'educations', 'skills',
             'skillGroups', 'specializations', 'certifications',
-            'searchResults', 'criteria'
+            'searchResults', 'criteria', 'histories' // <-- Jangan lupa tambahkan 'histories' di sini
         ));
     }
 
