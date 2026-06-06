@@ -1,399 +1,149 @@
 <x-app-layout>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .selected {
-            border-color: #6366f1 !important;
-            background-color: #eef2ff !important;
-            color: #1f2937 !important;
+        .font-jakarta { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
+        :root {
+            --blue:#1A2B6B; --blue-dark:#0D1B4B; --blue-light:#EEF1FB;
+            --blue-mid:#C7D0EE; --ink:#111827; --body:#374151;
+            --muted:#6B7280; --border:#E5E7EB; --bg:#F5F7FA;
+            --orange:#F5A524; --orange-dark:#D98D0F;
         }
-        @media (prefers-color-scheme: dark) {
-            .selected {
-                border-color: #6366f1 !important;
-                background-color: #0f172a !important;
-                color: #e6eef8 !important;
-            }
+        .sidebar-link {
+            display:flex; align-items:center; gap:0.75rem;
+            padding:0.65rem 0.85rem; border-radius:0.5rem;
+            font-weight:600; font-size:0.875rem; color:var(--body);
+            transition:all 0.2s; border-left:3px solid transparent;
+            text-decoration:none;
         }
-        .skill-group summary {
-            list-style: none;
-            cursor: pointer;
-        }
-        .skill-group summary::-webkit-details-marker {
-            display: none;
-        }
-        .skill-group[open] .skill-group-chevron {
-            transform: rotate(180deg);
-        }
+        .sidebar-link:hover { background:var(--blue-light); color:var(--blue); }
+        .sidebar-link.active { background:var(--blue-light); color:var(--blue); border-left-color:var(--blue); }
+        .btn-orange { background:var(--orange); color:white; font-weight:600; transition:all 0.2s; }
+        .btn-orange:hover { background:var(--orange-dark); transform:translateY(-1px); }
     </style>
-    <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h2 class="font-semibold text-xl text-gray-900 dark:text-gray-100 leading-tight">
-                    Dashboard Pencarian Karir
-                </h2>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                    Menampilkan data karir dari database dan memulai pencarian yang sesuai dengan pendidikan, skill, spesialisasi, dan sertifikat Anda.
-                </p>
-            </div>
 
-            <button id="open-search-modal" type="button" class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                Mulai Pencarian Pekerjaan
-            </button>
-        </div>
-    </x-slot>
+    <div class="font-jakarta flex flex-col md:flex-row min-h-screen bg-[#F5F7FA]">
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-            <div class="grid gap-4 xl:grid-cols-4 lg:grid-cols-2 sm:grid-cols-2">
-                <div class="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-700/80 dark:bg-slate-900">
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Karir</p>
-                    <p class="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ $careers->count() }}</p>
-                </div>
-                <div class="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-700/80 dark:bg-slate-900">
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Pilihan Pendidikan</p>
-                    <p class="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ $educations->count() }}</p>
-                </div>
-                <div class="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-700/80 dark:bg-slate-900">
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Skill Tersedia</p>
-                    <p class="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ $skills->count() }}</p>
-                </div>
-                <div class="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-700/80 dark:bg-slate-900">
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Spesialisasi & Sertifikat</p>
-                    <p class="mt-4 text-3xl font-semibold text-slate-900 dark:text-slate-100">{{ $specializations->count() + $certifications->count() }}</p>
-                </div>
-            </div>
+        @include('partials.sidebar')
 
-            <div class="grid gap-6 lg:grid-cols-3">
-                @foreach ($careers->take(6) as $career)
-                    <div class="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-slate-700/80 dark:bg-slate-900">
-                        <div class="flex items-center justify-between gap-4">
-                            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">{{ $career->career_name }}</h3>
-                            <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200">Karir</span>
-                        </div>
-                        <p class="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">Jelajahi karir ini dan lihat opsi teratas berdasarkan kombinasi skill, spesialisasi, pendidikan, dan sertifikat.</p>
+        <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 py-10 space-y-10">
+
+            {{-- Hero --}}
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white p-8 rounded-3xl border border-[#E5E7EB] shadow-sm relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-[#EEF1FB] rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-1.5 bg-[#EEF1FB] text-[#1A2B6B] text-[0.72rem] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-[#C7D0EE] mb-4">
+                        ✦ Dashboard Sistem
                     </div>
-                @endforeach
+                    <h2 class="font-extrabold text-3xl text-[#111827] leading-tight">
+                        Halo, <span class="text-[#1A2B6B]">{{ Auth::user()->name }}</span> 👋
+                    </h2>
+                    <p class="mt-3 text-[0.95rem] text-[#6B7280] max-w-lg">
+                        Selamat datang di SIREKA. Mulai analisis karir atau eksplorasi daftar karir IT yang tersedia.
+                    </p>
+                </div>
+                <div class="relative z-10 flex gap-3 flex-wrap">
+                    <a href="{{ route('analysis.form') }}"
+                       class="btn-orange px-6 py-3.5 rounded-xl text-sm flex items-center gap-2">
+                        <span>Mulai Analisis Karir</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </a>
+                    <a href="{{ route('careers.index') }}"
+                       class="px-6 py-3.5 rounded-xl text-sm flex items-center gap-2 bg-white border border-[#E5E7EB] font-semibold text-[#374151] hover:border-[#1A2B6B] hover:text-[#1A2B6B] transition-all">
+                        Lihat Daftar Karir
+                    </a>
+                </div>
             </div>
 
-            <div class="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-700/80 dark:bg-slate-900">
-                <div class="flex items-center justify-between gap-4">
+            {{-- Stat Cards --}}
+            <div class="grid gap-5 xl:grid-cols-4 lg:grid-cols-2 sm:grid-cols-2">
+                <div class="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm flex items-center gap-4 transition hover:-translate-y-1 hover:shadow-md">
+                    <div class="w-12 h-12 rounded-xl bg-[#EEF1FB] flex items-center justify-center text-[#1A2B6B] shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Hasil Pencarian</h3>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Hasil akan terurut berdasarkan kecocokan dengan data yang Anda pilih.</p>
+                        <p class="text-xs font-bold text-[#6B7280] uppercase tracking-wider">Total Karir</p>
+                        <p class="mt-1 text-2xl font-extrabold text-[#111827]">{{ $careers->count() }}</p>
                     </div>
                 </div>
-
-                @if ($searchResults->isNotEmpty())
-                    <div class="mt-6 space-y-4">
-                        @foreach ($searchResults as $result)
-                            <div class="rounded-3xl border border-slate-200/80 bg-slate-50 p-5 dark:border-slate-700/80 dark:bg-slate-950">
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <h4 class="font-semibold text-slate-900 dark:text-slate-100">{{ $result->career_name }}</h4>
-                                        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Kecocokan: <span class="font-semibold text-slate-900 dark:text-slate-100">{{ number_format($result->score, 2) }}%</span></p>
-                                    </div>
-                                    <span class="inline-flex rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-200">Rekomendasi</span>
-                                </div>
-                            </div>
-                        @endforeach
+                <div class="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm flex items-center gap-4 transition hover:-translate-y-1 hover:shadow-md">
+                    <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-[#F5A524] shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        </svg>
                     </div>
-                @elseif(array_filter($criteria))
-                    <div class="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-800 dark:border-amber-700/80 dark:bg-amber-900/10 dark:text-amber-100">
-                        <p class="font-medium">Tidak ada kecocokan yang ditemukan.</p>
-                        <p class="mt-2 text-sm text-amber-700 dark:text-amber-200">Coba pilih kombinasi education, skill, specialization, atau sertifikat lain untuk memperluas hasil pencarian.</p>
+                    <div>
+                        <p class="text-xs font-bold text-[#6B7280] uppercase tracking-wider">Pendidikan</p>
+                        <p class="mt-1 text-2xl font-extrabold text-[#111827]">{{ $educations->count() }}</p>
                     </div>
-                @else
-                    <div class="mt-6 rounded-3xl border border-slate-200/80 bg-slate-50 p-6 text-slate-700 dark:border-slate-700/80 dark:bg-slate-950 dark:text-slate-300">
-                        <p class="font-medium">Tekan tombol &quot;Mulai Pencarian Pekerjaan&quot; untuk mengisi preferensi Anda.</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <div id="search-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4 py-6">
-        <div class="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white text-slate-900 shadow-2xl dark:bg-slate-900 dark:text-slate-100">
-            <div class="flex shrink-0 items-center justify-between border-b border-slate-200 px-6 py-5 dark:border-slate-700/80">
-                <div>
-                    <h3 class="text-xl font-semibold">Isi data pencarian</h3>
-                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Ikuti langkah berikut untuk memilih kriteria dan lihat hasilnya langsung.</p>
                 </div>
-                <button id="close-search-modal" type="button" class="rounded-full border border-slate-200 bg-white px-3 py-2 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
-                    Close
-                </button>
+                <div class="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm flex items-center gap-4 transition hover:-translate-y-1 hover:shadow-md">
+                    <div class="w-12 h-12 rounded-xl bg-[#EEF1FB] flex items-center justify-center text-[#1A2B6B] shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-[#6B7280] uppercase tracking-wider">Skill Tersedia</p>
+                        <p class="mt-1 text-2xl font-extrabold text-[#111827]">{{ $skills->count() }}</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm flex items-center gap-4 transition hover:-translate-y-1 hover:shadow-md">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-[#6B7280] uppercase tracking-wider">Spesialisasi</p>
+                        <p class="mt-1 text-2xl font-extrabold text-[#111827]">{{ $specializations->count() + $certifications->count() }}</p>
+                    </div>
+                </div>
             </div>
 
-            <form method="GET" action="{{ route('dashboard') }}" id="wizard-form" class="flex min-h-0 flex-1 flex-col">
-                <div class="shrink-0 border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-slate-700/80 dark:bg-slate-950">
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex items-center gap-3">
-                            <span id="step-label" class="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">Step 1</span>
-                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ request()->query('education_id') ? 'Lengkapi kriteria Anda' : 'Pilih data pendidikan terlebih dahulu' }}</span>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-sm text-slate-500 dark:text-slate-400">
-                            <span class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 shadow-sm dark:bg-slate-800">
-                                Education: <strong class="text-slate-800 dark:text-slate-100">{{ optional($educations->firstWhere('education_id', request('education_id')))->education_level ?? 'Belum pilih' }}</strong>
-                            </span>
-                            <span class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 shadow-sm dark:bg-slate-800">
-                                Skills: <strong class="text-slate-800 dark:text-slate-100">{{ count(request('skill_ids', [])) }} dipilih</strong>
-                            </span>
-                            <span class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 shadow-sm dark:bg-slate-800">
-                                Specializations: <strong class="text-slate-800 dark:text-slate-100">{{ count(request('specialization_ids', [])) }} dipilih</strong>
-                            </span>
-                        </div>
+            {{-- Quick Links --}}
+            <div class="grid gap-5 md:grid-cols-3">
+                <a href="{{ route('analysis.form') }}"
+                   class="group bg-white rounded-2xl border border-[#E5E7EB] p-6 shadow-sm transition hover:-translate-y-1 hover:border-[#C7D0EE] hover:shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1A2B6B] to-[#F5A524] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-10 h-10 rounded-xl bg-[#EEF1FB] flex items-center justify-center text-[#1A2B6B] mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
                     </div>
-                </div>
+                    <h3 class="font-bold text-[#111827]">Mulai Analisis</h3>
+                    <p class="mt-1 text-sm text-[#6B7280]">Isi form wizard dan dapatkan rekomendasi karir terbaik.</p>
+                </a>
 
-                <div class="min-h-0 flex-1 overflow-y-auto px-6 py-6">
-                    <div data-step="1" class="step-panel">
-                        <div class="space-y-4">
-                            <p class="text-sm text-slate-600 dark:text-slate-400">Pilih satu pendidikan yang paling mendekati latar belakang Anda.</p>
-                            <label for="education_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Education</label>
-                            <select id="education_id" name="education_id" class="mt-2 block w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
-                                <option value="">Pilih pendidikan</option>
-                                @foreach ($educations as $item)
-                                    <option value="{{ $item->education_id }}" {{ request('education_id') == $item->education_id ? 'selected' : '' }}>{{ $item->education_level }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                <a href="{{ route('careers.index') }}"
+                   class="group bg-white rounded-2xl border border-[#E5E7EB] p-6 shadow-sm transition hover:-translate-y-1 hover:border-[#C7D0EE] hover:shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1A2B6B] to-[#F5A524] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-[#F5A524] mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
                     </div>
+                    <h3 class="font-bold text-[#111827]">Eksplorasi Karir</h3>
+                    <p class="mt-1 text-sm text-[#6B7280]">Lihat semua jalur karir IT yang tersedia beserta detailnya.</p>
+                </a>
 
-                    <div data-step="2" class="step-panel hidden">
-                        <div class="space-y-4">
-                            <p class="text-sm text-slate-600 dark:text-slate-400">Buka kategori skill, lalu klik skill yang Anda miliki. Pilihan akan disorot saat dipilih.</p>
-                            <div class="space-y-3">
-                                @foreach ($skillGroups as $category => $groupSkills)
-                                    <details class="skill-group rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950" {{ $loop->first ? 'open' : '' }}>
-                                        <summary class="flex items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-slate-800 dark:text-slate-100">
-                                            <span>{{ $category }}</span>
-                                            <span class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                                                <span>{{ count($groupSkills) }} skill</span>
-                                                <svg class="skill-group-chevron h-4 w-4 transition-transform" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
-                                                </svg>
-                                            </span>
-                                        </summary>
-                                        <div class="grid gap-2 border-t border-slate-200 p-3 md:grid-cols-2 dark:border-slate-700">
-                                            @foreach ($groupSkills as $item)
-                                                <button type="button" data-value="{{ $item->skill_id }}" data-group="skills" class="skill-item rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-slate-800 shadow-sm transition hover:border-indigo-400 hover:bg-indigo-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-indigo-500 dark:hover:bg-indigo-950 {{ in_array($item->skill_id, request('skill_ids', [])) ? 'selected border-indigo-500 bg-indigo-50 text-indigo-900 dark:border-indigo-500 dark:bg-indigo-950' : '' }}">
-                                                    <div class="flex items-center justify-between gap-2">
-                                                        <span class="font-medium">{{ $item->skill_name }}</span>
-                                                        <span class="text-xs text-slate-500 dark:text-slate-400">Skill</span>
-                                                    </div>
-                                                </button>
-                                            @endforeach
-                                        </div>
-                                    </details>
-                                @endforeach
-                            </div>
-                        </div>
+                <a href="{{ route('recommendation') }}"
+                   class="group bg-white rounded-2xl border border-[#E5E7EB] p-6 shadow-sm transition hover:-translate-y-1 hover:border-[#C7D0EE] hover:shadow-md relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1A2B6B] to-[#F5A524] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
                     </div>
+                    <h3 class="font-bold text-[#111827]">Lihat Hasil</h3>
+                    <p class="mt-1 text-sm text-[#6B7280]">Cek hasil analisis terakhir dan ranking kecocokan karirmu.</p>
+                </a>
+            </div>
 
-                    <div data-step="3" class="step-panel hidden">
-                        <div class="space-y-4">
-                            <p class="text-sm text-slate-600 dark:text-slate-400">Pilih spesialisasi yang relevan dengan tujuan karir Anda.</p>
-                            <div class="grid gap-3 md:grid-cols-2">
-                                @foreach ($specializations as $item)
-                                    <button type="button" data-value="{{ $item->specialization_id }}" data-group="specializations" class="specialization-item rounded-3xl border border-slate-200 bg-white px-4 py-3 text-left text-slate-800 shadow-sm transition hover:border-indigo-400 hover:bg-indigo-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:border-indigo-500 dark:hover:bg-indigo-950 {{ in_array($item->specialization_id, request('specialization_ids', [])) ? 'selected border-indigo-500 bg-indigo-50 text-indigo-900 dark:border-indigo-500 dark:bg-indigo-950' : '' }}">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <span class="font-medium">{{ $item->specialization_name }}</span>
-                                            <span class="text-xs text-slate-500 dark:text-slate-400">Spesialisasi</span>
-                                        </div>
-                                    </button>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-
-                    <div data-step="4" class="step-panel hidden">
-                        <div class="space-y-4">
-                            <p class="text-sm text-slate-600 dark:text-slate-400">Pilih satu sertifikat yang paling mewakili kemampuan Anda.</p>
-                            <label for="certification_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Sertifikat</label>
-                            <select id="certification_id" name="certification_id" class="mt-2 block w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
-                                <option value="">Pilih sertifikat</option>
-                                @foreach ($certifications as $item)
-                                    <option value="{{ $item->certification_id }}" {{ request('certification_id') == $item->certification_id ? 'selected' : '' }}>{{ $item->certification_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="skill-inputs"></div>
-                    <div id="specialization-inputs"></div>
-                </div>
-
-                <div class="shrink-0 border-t border-slate-200 bg-white px-6 py-4 dark:border-slate-700/80 dark:bg-slate-900">
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
-                            <button id="prev-step" type="button" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Back</button>
-                            <button id="next-step" type="button" class="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Next</button>
-                        </div>
-                        <div class="text-sm text-slate-500 dark:text-slate-400">Step <span id="current-step-number">1</span> dari 4</div>
-                    </div>
-                </div>
-
-                <div id="popup-results" class="max-h-48 shrink-0 overflow-y-auto border-t border-slate-200 bg-slate-50 px-6 py-4 dark:border-slate-700/80 dark:bg-slate-950">
-                    <h4 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Hasil Pencarian</h4>
-                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Hasil akan tampil di bawah setelah Anda menyelesaikan pilihan dan menekan tombol Next di step terakhir.</p>
-
-                    @if ($searchResults->isNotEmpty())
-                        <div class="mt-5 grid gap-4 lg:grid-cols-2">
-                            @foreach ($searchResults as $result)
-                                <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700/80 dark:bg-slate-900">
-                                    <div class="flex items-center justify-between gap-3">
-                                        <h5 class="font-semibold text-slate-900 dark:text-slate-100">{{ $result->career_name }}</h5>
-                                        <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-200">{{ number_format($result->score, 2) }}%</span>
-                                    </div>
-                                    <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Rekomendasi berdasarkan kombinasi pilihan Anda.</p>
-                                </div>
-                            @endforeach
-                        </div>
-                    @elseif(array_filter($criteria))
-                        <div class="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-800 dark:border-amber-700/80 dark:bg-amber-900/10 dark:text-amber-100">
-                            Belum ada hasil. Silakan cek kembali pilihan Anda atau lanjutkan untuk submit pencarian.
-                        </div>
-                    @else
-                        <div class="mt-5 rounded-3xl border border-slate-200 bg-white p-5 text-slate-700 dark:border-slate-700/80 dark:bg-slate-950 dark:text-slate-300">
-                            Hasil akan muncul di sini setelah Anda melengkapi semua langkah.
-                        </div>
-                    @endif
-                </div>
-            </form>
-        </div>
+        </main>
     </div>
-
-    <script>
-        const modal = document.getElementById('search-modal');
-        const openButton = document.getElementById('open-search-modal');
-        const closeButtons = [
-            document.getElementById('close-search-modal'),
-        ];
-        const stepPanels = Array.from(document.querySelectorAll('.step-panel'));
-        const stepLabel = document.getElementById('step-label');
-        const currentStepNumber = document.getElementById('current-step-number');
-        const prevButton = document.getElementById('prev-step');
-        const nextButton = document.getElementById('next-step');
-        const skillItems = Array.from(document.querySelectorAll('.skill-item'));
-        const specializationItems = Array.from(document.querySelectorAll('.specialization-item'));
-        const form = document.getElementById('wizard-form');
-        const skillInputs = document.getElementById('skill-inputs');
-        const specializationInputs = document.getElementById('specialization-inputs');
-
-        let currentStep = 1;
-        const maxStep = 4;
-        const selectedSkills = new Set(@json(array_map('strval', (array) request('skill_ids', []))));
-        const selectedSpecializations = new Set(@json(array_map('strval', (array) request('specialization_ids', []))));
-        function updateStep() {
-            stepPanels.forEach((panel, index) => {
-                panel.classList.toggle('hidden', index !== currentStep - 1);
-            });
-            currentStepNumber.textContent = currentStep;
-            stepLabel.textContent = `Step ${currentStep}`;
-            prevButton.disabled = currentStep === 1;
-            nextButton.textContent = currentStep === maxStep ? 'Cari Sekarang' : 'Next';
-        }
-
-        function toggleSelection(item, selectedSet) {
-            const value = item.dataset.value;
-            if (selectedSet.has(value)) {
-                selectedSet.delete(value);
-                item.classList.remove('border-indigo-500', 'bg-indigo-50', 'text-indigo-900', 'dark:border-indigo-500', 'dark:bg-indigo-950');
-                item.classList.remove('selected');
-            } else {
-                selectedSet.add(value);
-                item.classList.add('border-indigo-500', 'bg-indigo-50', 'text-indigo-900', 'dark:border-indigo-500', 'dark:bg-indigo-950');
-                item.classList.add('selected');
-            }
-            updateHiddenInputs();
-        }
-
-        function restoreSelections(items, selectedSet) {
-            items.forEach((item) => {
-                if (selectedSet.has(item.dataset.value)) {
-                    item.classList.add('border-indigo-500', 'bg-indigo-50', 'text-indigo-900', 'dark:border-indigo-500', 'dark:bg-indigo-950');
-                    item.classList.add('selected');
-                }
-            });
-        }
-
-        function updateHiddenInputs() {
-            skillInputs.innerHTML = '';
-            specializationInputs.innerHTML = '';
-
-            selectedSkills.forEach((value) => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'skill_ids[]';
-                input.value = value;
-                skillInputs.appendChild(input);
-            });
-
-            selectedSpecializations.forEach((value) => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'specialization_ids[]';
-                input.value = value;
-                specializationInputs.appendChild(input);
-            });
-        }
-
-        skillItems.forEach((item) => {
-            item.addEventListener('click', () => toggleSelection(item, selectedSkills));
-        });
-
-        specializationItems.forEach((item) => {
-            item.addEventListener('click', () => toggleSelection(item, selectedSpecializations));
-        });
-
-        restoreSelections(skillItems, selectedSkills);
-        restoreSelections(specializationItems, selectedSpecializations);
-        updateHiddenInputs();
-
-        prevButton.addEventListener('click', () => {
-            if (currentStep > 1) {
-                currentStep -= 1;
-                updateStep();
-            }
-        });
-
-        nextButton.addEventListener('click', () => {
-            if (currentStep < maxStep) {
-                currentStep += 1;
-                updateStep();
-            } else {
-                updateHiddenInputs();
-                form.submit();
-            }
-        });
-
-        form.addEventListener('submit', () => {
-            updateHiddenInputs();
-        });
-
-        openButton.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            updateStep();
-        });
-
-        closeButtons.forEach((button) => {
-            button.addEventListener('click', () => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            });
-        });
-
-        modal.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        });
-
-        const shouldOpenModal = @json(array_filter($criteria) ? true : false);
-        if (shouldOpenModal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            currentStep = maxStep;
-            updateStep();
-        }
-    </script>
 </x-app-layout>
