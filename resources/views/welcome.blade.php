@@ -19,16 +19,18 @@
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
             :root {
-                --blue: #2563EB;
-                --blue-dark: #1D4ED8;
-                --blue-light: #EFF6FF;
-                --blue-mid: #DBEAFE;
-                --ink: #0F172A;
-                --body: #334155;
-                --muted: #64748B;
-                --border: #E2E8F0;
-                --bg: #F8FAFC;
+                --blue: #1A2B6B;
+                --blue-dark: #0D1B4B;
+                --blue-light: #EEF1FB;
+                --blue-mid: #C7D0EE;
+                --ink: #111827;
+                --body: #374151;
+                --muted: #6B7280;
+                --border: #E5E7EB;
+                --bg: #F5F7FA;
                 --white: #FFFFFF;
+                --orange: #F5A524;
+                --orange-dark: #D98D0F;
             }
 
             body {
@@ -143,10 +145,10 @@
             .nav-right .btn-nav-ghost { color: var(--body); border: 1px solid var(--border); }
             .nav-right .btn-nav-ghost:hover { background: var(--bg); }
             .nav-right .btn-nav-solid {
-                background: var(--blue);
+                background: var(--orange);
                 color: white;
             }
-            .nav-right .btn-nav-solid:hover { background: var(--blue-dark); }
+            .nav-right .btn-nav-solid:hover { background: var(--orange-dark); }
 
             /* ─── HERO ─── */
             .hero-wrapper {
@@ -201,13 +203,13 @@
 
             .btn-primary {
                 display: inline-flex; align-items: center; gap: 0.4rem;
-                background: var(--blue); color: white;
+                background: var(--orange); color: white;
                 font-size: 0.85rem; font-weight: 600;
                 padding: 0.7rem 1.5rem; border-radius: 8px;
                 text-decoration: none; border: none; cursor: pointer;
                 transition: all 0.2s;
             }
-            .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+            .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,165,36,0.35); }
 
             .btn-secondary {
                 display: inline-flex; align-items: center; gap: 0.4rem;
@@ -245,7 +247,7 @@
                 border: 1px solid var(--border);
                 border-radius: 16px;
                 padding: 1.5rem;
-                box-shadow: 0 4px 24px rgba(15,23,42,0.06);
+                box-shadow: 0 4px 24px rgba(26,43,107,0.08);
             }
             .card-header {
                 display: flex; align-items: center; justify-content: space-between;
@@ -291,7 +293,7 @@
                 position: absolute; bottom: -1.5rem; left: -1.5rem;
                 background: white; border: 1px solid var(--border);
                 border-radius: 12px; padding: 0.9rem 1.1rem;
-                box-shadow: 0 8px 24px rgba(15,23,42,0.08);
+                box-shadow: 0 8px 24px rgba(26,43,107,0.1);
                 display: flex; align-items: center; gap: 0.75rem; min-width: 200px;
             }
             .float-icon {
@@ -338,7 +340,7 @@
                 display: grid; grid-template-columns: 220px 1fr;
                 border: 1px solid var(--border); border-radius: 16px;
                 overflow: hidden; background: white;
-                box-shadow: 0 2px 16px rgba(15,23,42,0.05);
+                box-shadow: 0 2px 16px rgba(26,43,107,0.06);
             }
             .careers-sidebar { background: var(--bg); padding: 8px 0; border-right: 1px solid var(--border); }
             .career-tab {
@@ -405,7 +407,7 @@
                 width: 52px; height: 52px; background: white;
                 border: 1px solid var(--border); border-radius: 12px;
                 display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
-                margin: 0 auto 0.75rem; box-shadow: 0 2px 8px rgba(15,23,42,0.04);
+                margin: 0 auto 0.75rem; box-shadow: 0 2px 8px rgba(26,43,107,0.06);
             }
             .step-num-badge {
                 width: 20px; height: 20px; background: var(--blue); color: white;
@@ -418,16 +420,17 @@
             /* ─── FEATURES ─── */
             .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
             .feature-card-mock {
-                background: white; border: 1px solid var(--border);
+                background: var(--blue-dark);
+                border: 1px solid rgba(255,255,255,0.08);
                 border-radius: 16px; padding: 1.5rem;
-                box-shadow: 0 4px 20px rgba(15,23,42,0.06);
+                box-shadow: 0 4px 20px rgba(13,27,75,0.25);
             }
-            .mock-title { font-size: 0.85rem; font-weight: 700; color: var(--ink); margin-bottom: 1rem; }
+            .mock-title { font-size: 0.85rem; font-weight: 700; color: #ffffff; margin-bottom: 1rem; }
             .rec-bar-item { margin-bottom: 0.75rem; }
-            .rec-bar-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--body); margin-bottom: 0.3rem; }
-            .rec-bar-label span:last-child { font-weight: 600; color: var(--blue); }
-            .rec-bar-track { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
-            .rec-bar-fill { height: 100%; background: var(--blue); border-radius: 3px; width: 0; transition: width 1s ease; }
+            .rec-bar-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: rgba(255,255,255,0.75); margin-bottom: 0.3rem; }
+            .rec-bar-label span:last-child { font-weight: 600; color: var(--orange); }
+            .rec-bar-track { height: 6px; background: rgba(255,255,255,0.12); border-radius: 3px; overflow: hidden; }
+            .rec-bar-fill { height: 100%; background: var(--orange); border-radius: 3px; width: 0; transition: width 1s ease; }
             .feature-badge {
                 display: inline-flex; align-items: center; gap: 0.4rem;
                 background: var(--blue-light); color: var(--blue);
@@ -450,7 +453,7 @@
                 background: white; border: 1px solid var(--border);
                 border-radius: 12px; padding: 1.5rem; transition: all 0.2s; cursor: default;
             }
-            .pillar-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(15,23,42,0.07); }
+            .pillar-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(26,43,107,0.09); }
             .pillar-icon { width: 40px; height: 40px; background: var(--blue-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 1rem; }
             .pillar-title { font-size: 0.88rem; font-weight: 700; color: var(--ink); margin-bottom: 0.4rem; }
             .pillar-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
@@ -467,7 +470,7 @@
 
             /* ─── FOOTER ─── */
             footer.site-footer {
-                background: var(--ink); padding: 2rem 3rem;
+                background: var(--blue-dark); padding: 2rem 3rem;
                 display: flex; align-items: center; justify-content: space-between;
             }
             footer.site-footer p { font-size: 0.75rem; color: rgba(255,255,255,0.4); }
@@ -523,14 +526,10 @@
             </div>
             <div class="nav-right">
                 @if (Route::has('login'))
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="btn-nav-solid">Dashboard</a>
-                    @else
-                        <a href="{{ route('login') }}" class="btn-nav-ghost">Masuk</a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="btn-nav-solid">Daftar</a>
-                        @endif
-                    @endauth
+                    <a href="{{ route('login') }}" class="btn-nav-ghost">Masuk</a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="btn-nav-solid">Daftar</a>
+                    @endif
                 @endif
             </div>
         </nav>
@@ -789,7 +788,7 @@
                             Bagaimana SIREKA menentukan tingkat kesesuaian?
                             <i class="ti ti-chevron-down"></i>
                         </div>
-                        <div class="faq-a">Kami menggunakan algoritma Simple Additive Weighting (SAW) yang menggabungkan bobot dari minat, pendidikan, sertifikasi, dan pengalaman praktis yang kamu masukkan untuk menghasilkan skor kecocokan yang akurat.</div>
+                        <div class="faq-a">Kami menggunakan algoritma Content Based Filtering (CBF) yang menyaring dan merekomendasikan item berdasarkan kemiripan antara fitur konten item tersebut dengan preferensi atau profil pengguna.</div>
                     </div>
                     <div class="faq-item">
                         <div class="faq-q">
