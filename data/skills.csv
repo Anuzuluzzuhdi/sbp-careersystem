@@ -1,11 +1,109 @@
 skill_id,skill_name
-1,Accounting
-2,Communication
-3,Counseling
-4,Data Analysis
-5,Financial Analysis
-6,MS Office
-7,Machine Learning
-8,Marketing
-9,Python
-10,SQL
+1,AWS
+2,Accounting
+3,Agile/Scrum
+4,Analytical Thinking
+5,Angular
+6,Ansible
+7,Azure
+8,Bash/Shell Scripting
+9,Bitbucket
+10,Burp Suite
+11,C
+12,C#
+13,C++
+14,CI/CD
+15,CSS
+16,Cassandra
+17,CentOS
+18,Communication
+19,Confluence
+20,Counseling
+21,Cryptography
+22,DNS
+23,Data Analysis
+24,Data Structures & Algorithms
+25,Debian
+26,Design Patterns
+27,Django
+28,Docker
+29,Elasticsearch
+30,Express
+31,Financial Analysis
+32,Firebase
+33,Firewall
+34,Flask
+35,Flutter
+36,Git
+37,GitHub
+38,GitHub Actions
+39,GitLab
+40,Go
+41,Google Cloud
+42,GraphQL
+43,HTML
+44,HTTP/HTTPS
+45,Hadoop
+46,Java
+47,JavaScript
+48,Jenkins
+49,Jetpack Compose
+50,Jira
+51,Kali Linux
+52,Kotlin
+53,Kotlin/Java (Android)
+54,Kubernetes
+55,Laravel
+56,Linux (Ubuntu)
+57,Load Balancer
+58,MS Office
+59,Machine Learning
+60,Marketing
+61,Metasploit
+62,Microservices
+63,MongoDB
+64,MySQL
+65,Next.js
+66,Node.js
+67,Notion
+68,NumPy
+69,OOP
+70,OSI Model
+71,OWASP
+72,PHP
+73,Pandas
+74,Penetration Testing
+75,PostgreSQL
+76,Power BI
+77,PowerShell
+78,Problem Solving
+79,PyTorch
+80,Python
+81,R
+82,REST API
+83,React
+84,React Native
+85,Redis
+86,Ruby
+87,Rust
+88,SIEM
+89,SQL
+90,SQLite
+91,Scala
+92,Scikit-learn
+93,Spark
+94,Spring Boot
+95,Subnetting
+96,Swift
+97,Swift (iOS)
+98,System Design
+99,TCP/IP
+100,Tableau
+101,Technical Writing
+102,TensorFlow
+103,Terraform
+104,TypeScript
+105,VPN
+106,Vue
+107,Windows Server
+108,Wireshark

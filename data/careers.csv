@@ -1,6 +1,51 @@
 career_id,career_name
-1,Business Analyst
-2,Data Entry Operator
-3,ML Engineer
-4,Research Scientist
-5,Software Engineer
+1,AI Research Scientist
+2,AR/VR Developer
+3,Automation Test Engineer
+4,Backend Developer
+5,Blockchain Developer
+6,Business Analyst
+7,Business Intelligence Analyst
+8,Cloud Engineer
+9,Computer Vision Engineer
+10,Cryptographer
+11,Cybersecurity Analyst
+12,Data Analyst
+13,Data Engineer
+14,Data Entry Operator
+15,Data Scientist
+16,Database Administrator (DBA)
+17,DevOps Engineer
+18,Embedded Systems Engineer
+19,Enterprise Architect
+20,Firmware Engineer
+21,Frontend Developer
+22,Full Stack Developer
+23,Game Developer
+24,IT Consultant
+25,IT Project Manager
+26,IT Support / Help Desk
+27,Infrastructure Engineer
+28,IoT Engineer
+29,ML Engineer
+30,Machine Learning Engineer
+31,Mobile Developer (iOS / Android)
+32,NLP Engineer
+33,Network Engineer
+34,Penetration Tester (Ethical Hacker)
+35,Platform Engineer
+36,Product Designer
+37,Product Manager
+38,QA Engineer / Software Tester
+39,Research Scientist
+40,SOC Analyst
+41,Scrum Master / Agile Coach
+42,Security Engineer
+43,Site Reliability Engineer (SRE)
+44,Software Engineer
+45,Software Engineer / Developer
+46,Solutions Architect
+47,System Administrator
+48,Technical Support Specialist
+49,Technical Writer
+50,UI/UX Designer

@@ -1,8 +1,124 @@
 certification_id,certification_name
-1,AWS Certified
-2,CFA Level 1
-3,Creative Writing
-4,Digital Marketing
-5,Google Data Analytics
-6,Mental Health Basics
-7,Tally ERP
+1,AIPMM CPM
+2,ARM Certified Engineer
+3,AWS Certified
+4,AWS Certified Data Analytics
+5,AWS Certified DevOps Engineer
+6,AWS Certified Developer
+7,AWS Certified Machine Learning
+8,AWS Certified Mobile
+9,AWS Certified SysOps
+10,AWS DevOps
+11,AWS GameTech
+12,AWS IoT Specialty
+13,AWS Security Specialty
+14,AWS Solutions Architect
+15,AWS Solutions Architect Professional
+16,AWS SysOps Administrator
+17,Adobe Certified Professional
+18,Apple Certified Developer
+19,CEH
+20,CEH (Certified Ethical Hacker)
+21,CFA Level 1
+22,CISM
+23,CISSP
+24,CKA (Kubernetes)
+25,CertNexus IoT
+26,Certified Blockchain Developer
+27,Certified Scrum Master (CSM)
+28,Cisco CCNA
+29,Cisco CCNP
+30,Cisco CyberOps
+31,CompTIA A+
+32,CompTIA Cloud+
+33,CompTIA IT Fundamentals
+34,CompTIA Linux+
+35,CompTIA Network+
+36,CompTIA PenTest+
+37,CompTIA Project+
+38,CompTIA Security+
+39,Coursera ML Specialization
+40,Creative Writing
+41,Databricks Associate
+42,Databricks ML Associate
+43,DeepLearning.AI NLP Specialization
+44,DeepLearning.AI Specialization
+45,Digital Marketing
+46,Docker Certified Associate
+47,Ethereum Developer Certification
+48,Figma Professional
+49,GCIA (GIAC)
+50,GitHub Certified
+51,Google Associate Android Developer
+52,Google Associate Cloud Engineer
+53,Google Cloud Architect
+54,Google Cloud Professional
+55,Google Data Analytics
+56,Google IT Support
+57,Google Professional Data Engineer
+58,Google Professional ML Engineer
+59,Google Professional SRE
+60,Google Project Management
+61,Google Technical Writing
+62,Google UX Design Certificate
+63,HDI Support Center Analyst
+64,HP ALM Certified
+65,HashiCorp Terraform
+66,Hyperledger Fabric
+67,IBM Business Analytics
+68,IBM Data Analyst Professional
+69,IBM Data Science Professional
+70,IBM QRadar
+71,ICAgile
+72,IIBA CBAP
+73,ISTQB Advanced
+74,ISTQB Foundation
+75,ITIL Expert
+76,ITIL Foundation
+77,Interaction Design Foundation
+78,Juniper JNCIA
+79,Linux Foundation CKA
+80,Markdown Expert
+81,Mental Health Basics
+82,Meta Front-End Developer
+83,Meta Full Stack Developer
+84,Meta Spark AR
+85,Microsoft Azure Administrator
+86,Microsoft Azure Developer
+87,Microsoft Azure Solutions Architect
+88,Microsoft MCSA
+89,Microsoft MTA
+90,Microsoft Office Specialist
+91,Microsoft Power BI
+92,Microsoft SQL Server Certification
+93,MySQL Certified
+94,NVIDIA Deep Learning
+95,NVIDIA Deep Learning Institute
+96,OSCP (Offensive Security)
+97,Oracle DBA Certified
+98,Oracle Java Certified
+99,PMI-ACP
+100,PMI-PBA
+101,PMP
+102,PMP (Project Management Professional)
+103,PRINCE2
+104,PostgreSQL Associate
+105,React Native Certification
+106,Red Hat RHCSA
+107,SAFe Agilist
+108,STC Certification
+109,Scrum Master (CSM)
+110,Scrum Product Owner (CSPO)
+111,Selenium Certification
+112,Snowflake SnowPro
+113,Splunk Certified
+114,TOGAF
+115,Tableau Desktop Specialist
+116,Tally ERP
+117,TensorFlow Developer Certificate
+118,Tricentis Tosca
+119,Unity Certified Developer
+120,Unreal Engine Certification
+121,Zachman Framework
+122,eJPT
+123,freeCodeCamp Certification
