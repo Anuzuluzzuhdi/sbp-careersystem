@@ -679,8 +679,8 @@
                     <div class="step-item">
                         <div class="step-icon-wrap">⚖️</div>
                         <div class="step-num-badge">4</div>
-                        <div class="step-title-sm">Criteria Weighting</div>
-                        <p class="step-desc-sm">Perhitungan bobot preferensi personal via SAW.</p>
+                        <div class="step-title-sm">CBF & SAW</div>
+                        <p class="step-desc-sm">Cocokkan profil kamu dengan karir (CBF), lalu hitung ranking kecocokan (SAW).</p>
                     </div>
                     <div class="step-item">
                         <div class="step-icon-wrap">🏆</div>
@@ -738,7 +738,7 @@
                             </div>
                             <div class="feature-check">
                                 <div class="check-icon">✓</div>
-                                <span><strong>Metode SAW</strong> — Perhitungan berbasis Simple Additive Weighting yang akurat.</span>
+                                <span><strong>CBF + SAW</strong> — Pencocokan profil berbasis Content-Based Filtering dan perankingan Simple Additive Weighting.</span>
                             </div>
                         </div>
                     </div>
@@ -788,7 +788,7 @@
                             Bagaimana SIREKA menentukan tingkat kesesuaian?
                             <i class="ti ti-chevron-down"></i>
                         </div>
-                        <div class="faq-a">Kami menggunakan algoritma Content Based Filtering (CBF) yang menyaring dan merekomendasikan item berdasarkan kemiripan antara fitur konten item tersebut dengan preferensi atau profil pengguna.</div>
+                        <div class="faq-a">SIREKA menggunakan Content-Based Filtering (CBF) untuk mencocokkan profil kamu—pendidikan, skill, spesialisasi, dan sertifikat—dengan profil setiap karir. Skor kecocokan dihitung dengan Simple Additive Weighting (SAW), lalu dinormalisasi menjadi persentase 0–100% agar ranking karir lebih mudah dipahami.</div>
                     </div>
                     <div class="faq-item">
                         <div class="faq-q">

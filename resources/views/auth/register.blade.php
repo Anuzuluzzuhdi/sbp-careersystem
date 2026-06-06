@@ -238,7 +238,7 @@
                 </div>
                 <div class="feature-row">
                     <div class="feat-check">✓</div>
-                    <span>Rekomendasi personal berbasis metode CBF</span>
+                    <span>Rekomendasi personal dengan CBF + SAW</span>
                 </div>
                 <div class="feature-row">
                     <div class="feat-check">✓</div>
