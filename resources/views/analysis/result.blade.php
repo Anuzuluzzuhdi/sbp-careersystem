@@ -4,27 +4,54 @@
     <style>
         .font-jakarta { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
         :root {
-            --blue:#1A2B6B; --blue-dark:#0D1B4B; --blue-light:#EEF1FB;
-            --blue-mid:#C7D0EE; --ink:#111827; --body:#374151;
-            --muted:#6B7280; --border:#E5E7EB; --bg:#F5F7FA;
-            --orange:#F5A524; --orange-dark:#D98D0F;
+            --blue: #1A2B6B; --blue-dark: #0D1B4B; --blue-light: #EEF1FB;
+            --blue-mid: #C7D0EE; --ink: #111827; --body: #374151;
+            --muted: #6B7280; --border: #E5E7EB; --bg: #F5F7FA;
+            --orange: #F5A524; --orange-dark: #D98D0F;
+            --glass-border: rgba(229, 231, 235, 0.7);
         }
+
+        /* ===== BACKGROUND MESH ===== */
+        .main-workspace {
+            position: relative;
+            z-index: 1;
+        }
+        .main-workspace::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 60% 60% at 85% 10%, rgba(26,43,107,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 15% 80%, rgba(245,165,36,0.05) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ===== GLASS CARD ===== */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(26, 43, 107, 0.05);
+        }
+
         .sidebar-link {
-            display:flex; align-items:center; gap:0.75rem;
-            padding:0.65rem 0.85rem; border-radius:0.5rem;
-            font-weight:600; font-size:0.875rem; color:var(--body);
-            transition:all 0.2s; border-left:3px solid transparent;
-            text-decoration:none;
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 1rem; border-radius: 0.75rem;
+            font-weight: 600; font-size: 0.875rem; color: var(--body);
+            transition: all 0.2s; border-left: 3px solid transparent;
+            text-decoration: none;
         }
-        .sidebar-link:hover { background:var(--blue-light); color:var(--blue); }
-        .sidebar-link.active { background:var(--blue-light); color:var(--blue); border-left-color:var(--blue); }
-        #sidebar.desktop-collapsed { width:0 !important; overflow:hidden; border-right:none; }
-        .score-bar-fill { width:0; transition:width 1.2s ease; }
+        .sidebar-link:hover { background: var(--blue-light); color: var(--blue); }
+        .sidebar-link.active { background: var(--blue-light); color: var(--blue); border-left-color: var(--blue); }
+        #sidebar.desktop-collapsed { width: 0 !important; overflow: hidden; border-right: none; }
+        .score-bar-fill { width: 0; transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 
     <div class="font-jakarta flex flex-col min-h-screen bg-[#F5F7FA]">
 
-        {{-- HEADER --}}
+        {{-- HEADER (TIDAK DISENTUH 100%) --}}
         <header class="font-jakarta sticky top-0 z-50 flex items-center justify-between px-4 sm:px-6 h-16 bg-white border-b border-[#E5E7EB] shadow-sm shrink-0">
             <div class="flex items-center gap-3">
                 <button id="sidebar-toggle"
@@ -59,21 +86,22 @@
         <div class="flex flex-1">
             @include('partials.sidebar')
 
-            <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 py-10 space-y-8 min-w-0">
+            {{-- Menggunakan main-workspace dan padding yg responsif agar full-width rapat --}}
+            <main class="main-workspace flex-1 w-full px-6 sm:px-10 lg:px-12 pt-8 pb-12 space-y-8 min-w-0">
 
-                {{-- Header --}}
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {{-- Header Page --}}
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
                     <div>
-                        <div class="inline-flex items-center gap-1.5 bg-[#EEF1FB] text-[#1A2B6B] text-[0.72rem] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-[#C7D0EE] mb-3">
-                            🏆 Hasil Rekomendasi
+                        <div class="inline-flex items-center gap-2 bg-white text-[#1A2B6B] text-[0.75rem] font-bold uppercase tracking-wider px-4 py-1.5 rounded-full border border-[#C7D0EE] mb-4 shadow-sm">
+                            <span class="text-[#F5A524]">🏆</span> Hasil Rekomendasi
                         </div>
-                        <h2 class="text-2xl font-extrabold text-[#111827]">Hasil Analisis Karir</h2>
-                        <p class="mt-1 text-sm text-[#6B7280]">Peringkat karir berdasarkan data yang kamu masukkan menggunakan metode SAW.</p>
+                        <h2 class="text-3xl md:text-4xl font-extrabold text-[#111827] tracking-tight">Hasil <span class="text-[#1A2B6B]">Analisis Karir</span></h2>
+                        <p class="mt-2 text-[0.95rem] text-[#6B7280] max-w-xl leading-relaxed">Peringkat karir berdasarkan data yang kamu masukkan menggunakan metode SAW.</p>
                     </div>
                     <a href="{{ route('analysis.form') }}"
-                       class="inline-flex items-center gap-2 bg-white border border-[#E5E7EB] hover:border-[#1A2B6B] hover:text-[#1A2B6B] text-[#374151] px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shrink-0">
+                       class="inline-flex items-center justify-center gap-2 bg-white border-2 border-[#E5E7EB] hover:border-[#1A2B6B] hover:text-[#1A2B6B] hover:bg-[#EEF1FB] text-[#374151] px-6 py-3 rounded-xl text-[0.9rem] font-bold transition-all shrink-0 shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
                         Ubah Pencarian
                     </a>
@@ -81,13 +109,13 @@
 
                 {{-- Kriteria yang dipakai --}}
                 @if (array_filter($criteria))
-                    <div class="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm">
-                        <p class="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">Kriteria yang digunakan</p>
-                        <div class="flex flex-wrap gap-2">
+                    <div class="glass-card p-6 md:p-8">
+                        <p class="text-[0.75rem] font-extrabold text-[#6B7280] uppercase tracking-wider mb-4">Kriteria yang dianalisis:</p>
+                        <div class="flex flex-wrap gap-2.5">
                             @if ($criteria['education_id'])
                                 @php $edu = collect($educations)->firstWhere('education_id', $criteria['education_id']); @endphp
                                 @if ($edu)
-                                    <span class="inline-flex items-center gap-1.5 bg-[#EEF1FB] text-[#1A2B6B] border border-[#C7D0EE] text-xs font-bold px-3 py-1 rounded-full">
+                                    <span class="inline-flex items-center gap-2 bg-white text-[#1A2B6B] border border-[#C7D0EE] text-[0.8rem] font-bold px-4 py-1.5 rounded-full shadow-sm">
                                         🎓 {{ $edu->education_level }}
                                     </span>
                                 @endif
@@ -95,7 +123,7 @@
                             @foreach (($criteria['skill_ids'] ?? []) as $sid)
                                 @php $sk = collect($skills)->firstWhere('skill_id', $sid); @endphp
                                 @if ($sk)
-                                    <span class="inline-flex items-center gap-1.5 bg-orange-50 text-orange-700 border border-orange-200 text-xs font-bold px-3 py-1 rounded-full">
+                                    <span class="inline-flex items-center gap-2 bg-[#FFF8ED] text-[#D98D0F] border border-[#F5A524] text-[0.8rem] font-bold px-4 py-1.5 rounded-full shadow-sm">
                                         ⚡ {{ $sk->skill_name }}
                                     </span>
                                 @endif
@@ -103,7 +131,7 @@
                             @foreach (($criteria['specialization_ids'] ?? []) as $spid)
                                 @php $sp = collect($specializations)->firstWhere('specialization_id', $spid); @endphp
                                 @if ($sp)
-                                    <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1 rounded-full">
+                                    <span class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[0.8rem] font-bold px-4 py-1.5 rounded-full shadow-sm">
                                         🎯 {{ $sp->specialization_name }}
                                     </span>
                                 @endif
@@ -111,7 +139,7 @@
                             @if ($criteria['certification_id'])
                                 @php $cert = collect($certifications)->firstWhere('certification_id', $criteria['certification_id']); @endphp
                                 @if ($cert)
-                                    <span class="inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold px-3 py-1 rounded-full">
+                                    <span class="inline-flex items-center gap-2 bg-purple-50 text-purple-700 border border-purple-200 text-[0.8rem] font-bold px-4 py-1.5 rounded-full shadow-sm">
                                         📜 {{ $cert->certification_name }}
                                     </span>
                                 @endif
@@ -181,66 +209,67 @@
                     @endphp
 
                     {{-- Top result highlight --}}
-                    <div class="relative bg-gradient-to-br from-[#1A2B6B] to-[#0D1B4B] rounded-3xl p-6 md:p-8 text-white overflow-hidden shadow-lg">
-                        <div class="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-                        <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3 pointer-events-none"></div>
-                        <div class="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                    <div class="relative bg-gradient-to-br from-[#1A2B6B] to-[#0D1B4B] rounded-3xl p-8 md:p-10 text-white overflow-hidden shadow-xl shadow-blue-900/10">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+                        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3 pointer-events-none"></div>
+                        <div class="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-8">
                             <div class="flex-1">
-                                <div class="inline-flex items-center gap-1.5 bg-[#F5A524]/20 text-[#F5A524] text-[0.72rem] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-[#F5A524]/30 mb-4">
+                                <div class="inline-flex items-center gap-1.5 bg-[#F5A524]/20 text-[#F5A524] text-[0.75rem] font-bold uppercase tracking-wider px-4 py-1.5 rounded-full border border-[#F5A524]/30 mb-5">
                                     🏆 Rekomendasi Utama
                                 </div>
-                                <h3 class="text-3xl font-extrabold mb-2">{{ $top->career_name }}</h3>
-                                <p class="text-white/80 text-sm mb-6 leading-relaxed">{{ $topDetail['desc'] }}</p>
+                                <h3 class="text-4xl font-extrabold mb-3 tracking-tight">{{ $top->career_name }}</h3>
+                                <p class="text-white/80 text-[1rem] mb-6 max-w-2xl leading-relaxed">{{ $topDetail['desc'] }}</p>
+                                
                                 <details class="group/topdetail">
-                                    <summary class="inline-flex items-center gap-2 text-sm font-bold text-white/80 cursor-pointer list-none hover:text-[#F5A524] transition-colors bg-white/10 px-4 py-2 rounded-xl border border-white/20">
+                                    <summary class="inline-flex items-center gap-2 text-[0.9rem] font-bold text-white/90 cursor-pointer list-none hover:text-[#F5A524] transition-colors bg-white/10 hover:bg-white/15 px-5 py-2.5 rounded-xl border border-white/20">
                                         <span>Lihat Detail Karir</span>
                                         <svg class="w-4 h-4 transform group-open/topdetail:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
                                         </svg>
                                     </summary>
-                                    <div class="mt-4 space-y-4 text-sm text-white/90 bg-white/5 backdrop-blur-sm p-5 rounded-2xl border border-white/10">
+                                    <div class="mt-5 space-y-5 text-[0.95rem] text-white/90 bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 max-w-3xl">
                                         <div>
-                                            <div class="font-bold text-[#F5A524] flex items-center gap-2"><span class="text-lg">🎯</span> Jobdesk Utama:</div>
-                                            <p class="mt-1 leading-relaxed pl-7">{{ $topDetail['jobdesk'] }}</p>
+                                            <div class="font-extrabold text-[#F5A524] flex items-center gap-2 tracking-wide uppercase text-xs mb-1.5"><span class="text-lg">🎯</span> Jobdesk Utama</div>
+                                            <p class="leading-relaxed pl-8">{{ $topDetail['jobdesk'] }}</p>
                                         </div>
                                         <div>
-                                            <div class="font-bold text-[#F5A524] flex items-center gap-2"><span class="text-lg">💰</span> Estimasi Gaji:</div>
-                                            <p class="mt-1 font-bold text-emerald-400 pl-7">{{ $topDetail['salary'] }}</p>
+                                            <div class="font-extrabold text-[#F5A524] flex items-center gap-2 tracking-wide uppercase text-xs mb-1.5"><span class="text-lg">💰</span> Estimasi Gaji</div>
+                                            <p class="font-bold text-emerald-400 pl-8 text-lg">{{ $topDetail['salary'] }}</p>
                                         </div>
                                     </div>
                                 </details>
                             </div>
-                            <div class="shrink-0 bg-white/10 backdrop-blur rounded-2xl px-8 py-5 text-center border border-white/20 self-start md:self-center mt-4 md:mt-0">
-                                <div class="text-4xl font-extrabold text-[#F5A524]">{{ number_format($top->score, 1) }}%</div>
-                                <div class="text-xs text-white/60 font-medium mt-1">Kecocokan</div>
+                            <div class="shrink-0 bg-white/10 backdrop-blur-md rounded-2xl px-8 py-6 text-center border border-white/20 self-start md:self-center mt-4 md:mt-0 shadow-lg">
+                                <div class="text-5xl font-extrabold text-[#F5A524] drop-shadow-md">{{ number_format($top->score, 1) }}%</div>
+                                <div class="text-sm text-white/70 font-bold uppercase tracking-widest mt-2">Kecocokan</div>
                             </div>
                         </div>
                     </div>
 
                     {{-- Semua hasil --}}
                     <div>
-                        <h3 class="text-base font-extrabold text-[#111827] mb-4">Semua Hasil Ranking</h3>
-                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <h3 class="text-xl font-extrabold text-[#111827] mb-5 pl-1">Semua Hasil Ranking</h3>
+                        <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                             @foreach ($searchResults as $index => $result)
-                                <div class="relative bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm transition hover:border-[#C7D0EE] hover:shadow-md group overflow-hidden">
-                                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1A2B6B] to-[#F5A524] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                    <div class="flex items-center justify-between mb-4">
-                                        <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold border
-                                            {{ $index === 0 ? 'bg-[#F5A524] text-white border-[#F5A524]' : 'bg-[#F5F7FA] text-[#6B7280] border-[#E5E7EB]' }}">
+                                <div class="relative glass-card p-6 transition-all duration-300 hover:border-[#1A2B6B]/30 hover:shadow-xl hover:shadow-blue-900/5 group overflow-hidden">
+                                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#1A2B6B] to-[#F5A524] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <div class="flex items-center justify-between mb-5">
+                                        <span class="w-8 h-8 rounded-full flex items-center justify-center text-[0.85rem] font-extrabold border shadow-sm
+                                            {{ $index === 0 ? 'bg-[#F5A524] text-white border-[#F5A524]' : 'bg-white text-[#6B7280] border-[#E5E7EB]' }}">
                                             {{ $index + 1 }}
                                         </span>
-                                        <span class="inline-flex rounded-lg bg-[#EEF1FB] px-2.5 py-1 text-xs font-bold text-[#1A2B6B] border border-[#C7D0EE]">
+                                        <span class="inline-flex rounded-lg bg-[#EEF1FB] px-3 py-1 text-[0.7rem] font-bold uppercase tracking-wider text-[#1A2B6B] border border-[#C7D0EE]">
                                             Rekomendasi
                                         </span>
                                     </div>
-                                    <h4 class="font-bold text-[#111827] text-base mb-4">{{ $result->career_name }}</h4>
-                                    <div class="mb-1 flex justify-between text-xs font-medium text-[#6B7280]">
+                                    <h4 class="font-extrabold text-[#111827] text-[1.1rem] mb-5 line-clamp-2 leading-snug">{{ $result->career_name }}</h4>
+                                    <div class="mb-2 flex justify-between text-[0.8rem] font-bold text-[#6B7280] uppercase tracking-wide">
                                         <span>Kecocokan</span>
-                                        <span class="font-extrabold {{ $result->score >= 80 ? 'text-emerald-600' : 'text-[#1A2B6B]' }}">
+                                        <span class="{{ $result->score >= 80 ? 'text-emerald-600' : 'text-[#1A2B6B]' }}">
                                             {{ number_format($result->score, 2) }}%
                                         </span>
                                     </div>
-                                    <div class="h-2 bg-[#F5F7FA] rounded-full overflow-hidden border border-[#E5E7EB]">
+                                    <div class="h-2.5 bg-[#F5F7FA] rounded-full overflow-hidden border border-[#E5E7EB] shadow-inner">
                                         <div class="score-bar-fill h-full rounded-full {{ $result->score >= 80 ? 'bg-emerald-500' : 'bg-[#1A2B6B]' }}"
                                              data-target="{{ $result->score }}"></div>
                                     </div>
@@ -250,34 +279,34 @@
                     </div>
 
                 @elseif (array_filter($criteria))
-                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-10 text-center">
-                        <div class="w-16 h-16 mx-auto bg-amber-100 rounded-full flex items-center justify-center text-2xl mb-4">⚠️</div>
-                        <p class="font-bold text-amber-900 text-lg">Tidak ada kecocokan tinggi</p>
-                        <p class="mt-2 text-sm text-amber-700 max-w-md mx-auto">Coba perluas pilihan skill atau ubah jenjang pendidikan.</p>
+                    <div class="glass-card border-amber-200 bg-amber-50/80 p-12 text-center">
+                        <div class="w-20 h-20 mx-auto bg-amber-100 rounded-full flex items-center justify-center text-3xl mb-5 shadow-sm">⚠️</div>
+                        <p class="font-extrabold text-amber-900 text-2xl">Tidak ada kecocokan tinggi</p>
+                        <p class="mt-3 text-[1rem] text-amber-700 max-w-lg mx-auto">Sistem tidak menemukan karir dengan kecocokan tinggi. Coba perluas pilihan skill atau ubah jenjang pendidikan kamu.</p>
                         <a href="{{ route('analysis.form') }}"
-                           class="mt-5 inline-block bg-[#F5A524] hover:bg-[#D98D0F] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
+                           class="mt-6 inline-block bg-[#F5A524] hover:bg-[#D98D0F] text-white px-8 py-3.5 rounded-xl text-[0.95rem] font-bold shadow-md transition-all hover:-translate-y-0.5">
                             Ubah Pencarian
                         </a>
                     </div>
                 @else
                     @if(isset($histories) && $histories->count() > 0)
-                        <div class="rounded-2xl border border-blue-200 bg-[#EEF1FB] p-6 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
-                            <div class="w-12 h-12 shrink-0 bg-white rounded-full flex items-center justify-center text-xl shadow-sm border border-blue-100">💡</div>
+                        <div class="glass-card border-blue-200 bg-[#EEF1FB]/60 p-8 flex flex-col sm:flex-row items-center gap-6">
+                            <div class="w-16 h-16 shrink-0 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm border border-blue-100">💡</div>
                             <div>
-                                <p class="font-bold text-[#1A2B6B] text-lg">Siap untuk analisis baru?</p>
-                                <p class="text-sm text-[#374151] mt-1">Kamu belum menjalankan analisis di sesi ini. Klik tombol <b>"Ubah Pencarian"</b> di pojok kanan atas untuk memasukkan skill baru, atau lihat riwayat analisismu di bawah.</p>
+                                <p class="font-extrabold text-[#1A2B6B] text-xl">Siap untuk analisis baru?</p>
+                                <p class="text-[0.95rem] text-[#374151] mt-2 leading-relaxed">Kamu belum menjalankan analisis di sesi ini. Klik tombol <b class="text-[#1A2B6B]">"Ubah Pencarian"</b> di pojok kanan atas untuk memasukkan profil baru, atau lihat riwayat analisismu di bawah.</p>
                             </div>
                         </div>
                     @else
-                        <div class="rounded-2xl border-2 border-dashed border-[#E5E7EB] bg-white p-10 text-center">
-                            <div class="w-16 h-16 mx-auto bg-white border border-[#E5E7EB] rounded-2xl flex items-center justify-center text-2xl shadow-sm mb-4">📊</div>
-                            <p class="font-bold text-[#111827] text-lg">Belum Ada Hasil</p>
-                            <p class="mt-2 text-sm text-[#6B7280] max-w-sm mx-auto">Kamu belum menjalankan analisis. Mulai sekarang untuk melihat rekomendasi karir.</p>
+                        <div class="rounded-3xl border-2 border-dashed border-[#C7D0EE] bg-white/50 backdrop-blur p-12 text-center max-w-3xl mx-auto">
+                            <div class="w-20 h-20 mx-auto bg-white border border-[#E5E7EB] rounded-2xl flex items-center justify-center text-3xl shadow-sm mb-5">📊</div>
+                            <p class="font-extrabold text-[#111827] text-2xl">Belum Ada Hasil</p>
+                            <p class="mt-3 text-[1rem] text-[#6B7280] max-w-md mx-auto">Kamu belum pernah menjalankan analisis. Mulai sekarang untuk melihat kemana arah karir terbaikmu!</p>
                             <a href="{{ route('analysis.form') }}"
-                               class="mt-5 inline-flex items-center gap-2 bg-[#F5A524] hover:bg-[#D98D0F] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
-                                Mulai Analisis
+                               class="mt-6 inline-flex items-center gap-2 bg-[#1A2B6B] hover:bg-[#0D1B4B] text-white px-8 py-3.5 rounded-xl text-[0.95rem] font-bold shadow-lg shadow-blue-900/20 transition-all hover:-translate-y-0.5">
+                                Mulai Analisis Sekarang
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                                 </svg>
                             </a>
                         </div>
@@ -286,47 +315,50 @@
 
                 {{-- Riwayat Analisis --}}
                 @if(isset($histories) && $histories->count() > 0)
-                    <div class="pt-8 mt-8 border-t border-[#E5E7EB]">
-                        <div class="flex items-center gap-2 mb-5">
-                            <div class="w-8 h-8 rounded-full bg-[#EEF1FB] flex items-center justify-center text-[#1A2B6B]">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="pt-10 mt-10 border-t border-[#E5E7EB]/70">
+                        <div class="flex items-center gap-3 mb-6 pl-1">
+                            <div class="w-10 h-10 rounded-full bg-[#1A2B6B] flex items-center justify-center text-white shadow-md">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h3 class="text-lg font-extrabold text-[#111827]">Riwayat Analisis Kamu</h3>
+                            <h3 class="text-xl font-extrabold text-[#111827]">Riwayat Analisis Kamu</h3>
                         </div>
-                        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                             @foreach ($histories as $history)
                                 @php
                                     $topHistory = $history->results[0] ?? null;
                                     $hCriteria = $history->criteria ?? [];
                                 @endphp
-                                <div class="bg-white rounded-2xl border border-[#E5E7EB] p-5 shadow-sm hover:border-[#C7D0EE] hover:shadow-md transition group relative overflow-hidden flex flex-col">
-                                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-[#F5F7FA] to-[#EEF1FB] rounded-bl-full pointer-events-none -z-10 group-hover:scale-110 transition-transform"></div>
-                                    <div class="text-xs font-bold text-[#6B7280] mb-3">
+                                <div class="glass-card p-6 hover:border-[#C7D0EE] hover:shadow-lg transition-all group relative overflow-hidden flex flex-col">
+                                    <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#F5F7FA] to-[#EEF1FB] rounded-bl-full pointer-events-none -z-10 group-hover:scale-125 transition-transform duration-500"></div>
+                                    
+                                    <div class="text-[0.7rem] font-extrabold text-[#6B7280] uppercase tracking-wider mb-4 border-b border-[#E5E7EB] pb-2">
                                         {{ $history->created_at->format('d M Y • H:i') }}
                                     </div>
+                                    
                                     @if($topHistory)
-                                        <div class="text-xs text-[#6B7280] mb-1">Rekomendasi Tertinggi:</div>
-                                        <h4 class="font-extrabold text-[#111827] text-base truncate">{{ $topHistory['career_name'] }}</h4>
-                                        <div class="mt-2 mb-4 flex items-center gap-2">
-                                            <div class="flex-1 h-1.5 bg-[#F5F7FA] rounded-full overflow-hidden">
+                                        <div class="text-[0.8rem] font-bold text-[#6B7280] mb-1">Rekomendasi Tertinggi:</div>
+                                        <h4 class="font-extrabold text-[#111827] text-[1.1rem] truncate mb-2">{{ $topHistory['career_name'] }}</h4>
+                                        <div class="mt-2 mb-6 flex items-center gap-3">
+                                            <div class="flex-1 h-2 bg-[#F5F7FA] rounded-full overflow-hidden shadow-inner border border-[#E5E7EB]">
                                                 <div class="h-full rounded-full {{ $topHistory['score'] >= 80 ? 'bg-emerald-500' : 'bg-[#1A2B6B]' }}" style="width: {{ $topHistory['score'] }}%"></div>
                                             </div>
-                                            <span class="text-xs font-extrabold {{ $topHistory['score'] >= 80 ? 'text-emerald-600' : 'text-[#1A2B6B]' }}">
+                                            <span class="text-[0.85rem] font-extrabold {{ $topHistory['score'] >= 80 ? 'text-emerald-600' : 'text-[#1A2B6B]' }}">
                                                 {{ number_format($topHistory['score'], 1) }}%
                                             </span>
                                         </div>
                                     @else
-                                        <div class="text-sm text-[#6B7280] italic mt-2 mb-4">Tidak ada hasil kecocokan</div>
+                                        <div class="text-sm text-[#6B7280] italic mt-2 mb-6">Tidak ada hasil kecocokan</div>
                                     @endif
-                                    <div class="mt-auto pt-3 border-t border-gray-100">
-                                        <p class="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider mb-2">Kriteria:</p>
-                                        <div class="flex flex-wrap gap-1.5">
+                                    
+                                    <div class="mt-auto pt-4 border-t border-gray-100">
+                                        <p class="text-[0.65rem] font-extrabold text-[#6B7280] uppercase tracking-wider mb-2.5">Kriteria:</p>
+                                        <div class="flex flex-wrap gap-2">
                                             @if (!empty($hCriteria['education_id']))
                                                 @php $edu = collect($educations)->firstWhere('education_id', $hCriteria['education_id']); @endphp
                                                 @if ($edu)
-                                                    <span class="inline-flex items-center bg-[#EEF1FB] text-[#1A2B6B] border border-[#C7D0EE] text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                                    <span class="inline-flex items-center bg-[#EEF1FB] text-[#1A2B6B] border border-[#C7D0EE] text-[0.65rem] font-bold px-2 py-1 rounded-md">
                                                         🎓 {{ $edu->education_level }}
                                                     </span>
                                                 @endif
@@ -334,7 +366,7 @@
                                             @foreach (($hCriteria['skill_ids'] ?? []) as $sid)
                                                 @php $sk = collect($skills)->firstWhere('skill_id', $sid); @endphp
                                                 @if ($sk)
-                                                    <span class="inline-flex items-center bg-orange-50 text-orange-700 border border-orange-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                                    <span class="inline-flex items-center bg-[#FFF8ED] text-[#D98D0F] border border-[#F5A524]/40 text-[0.65rem] font-bold px-2 py-1 rounded-md">
                                                         ⚡ {{ $sk->skill_name }}
                                                     </span>
                                                 @endif
@@ -342,7 +374,7 @@
                                             @foreach (($hCriteria['specialization_ids'] ?? []) as $spid)
                                                 @php $sp = collect($specializations)->firstWhere('specialization_id', $spid); @endphp
                                                 @if ($sp)
-                                                    <span class="inline-flex items-center bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                                    <span class="inline-flex items-center bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[0.65rem] font-bold px-2 py-1 rounded-md">
                                                         🎯 {{ $sp->specialization_name }}
                                                     </span>
                                                 @endif
@@ -350,7 +382,7 @@
                                             @if (!empty($hCriteria['certification_id']))
                                                 @php $cert = collect($certifications)->firstWhere('certification_id', $hCriteria['certification_id']); @endphp
                                                 @if ($cert)
-                                                    <span class="inline-flex items-center bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                                    <span class="inline-flex items-center bg-purple-50 text-purple-700 border border-purple-200/60 text-[0.65rem] font-bold px-2 py-1 rounded-md">
                                                         📜 {{ $cert->certification_name }}
                                                     </span>
                                                 @endif
