@@ -1,17 +1,25 @@
-<aside class="w-full md:w-64 bg-white border-r border-[#E5E7EB] shrink-0 md:sticky top-0 md:h-screen overflow-y-auto">
-    <div class="p-6 border-b border-[#E5E7EB] flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg overflow-hidden border border-[#E5E7EB] shrink-0">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-full h-full object-cover">
-        </div>
+{{-- Overlay untuk mobile saja --}}
+<div id="sidebar-overlay"
+     class="fixed inset-0 bg-black/40 z-30 hidden md:hidden"
+     onclick="closeSidebar()"></div>
+
+<aside id="sidebar"
+       class="font-jakarta w-64 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0
+              fixed top-0 left-0 h-full z-40 -translate-x-full transition-transform duration-300 ease-in-out
+              md:sticky md:top-16 md:h-[calc(100vh-4rem)] md:translate-x-0 md:z-auto overflow-y-auto">
+
+    {{-- Logo di dalam sidebar (hanya tampil di mobile, di desktop sudah ada di header) --}}
+    <div class="p-5 border-b border-[#E5E7EB] flex items-center gap-3 md:hidden">
+        <img src="{{ asset('images/logo3.png') }}" alt="Logo" class="h-8 w-auto object-contain">
         <div>
-            <h2 class="text-base font-extrabold text-[#111827] tracking-tight leading-none">
+            <h2 class="text-sm font-extrabold text-[#111827] tracking-tight leading-none">
                 SI<span class="text-[#1A2B6B]">REKA</span>
             </h2>
-            <p class="text-[0.65rem] text-[#6B7280] mt-0.5 font-medium">Navigasi Sistem Karir</p>
+            <p class="text-[0.65rem] text-[#6B7280] mt-0.5 font-medium">Sistem Rekomendasi Karir</p>
         </div>
     </div>
 
-    <nav class="p-4 flex flex-col gap-1">
+    <nav class="p-4 flex flex-col gap-1 flex-1">
         <p class="px-3 text-[0.65rem] font-bold tracking-wider text-[#6B7280] uppercase mb-1 mt-2">Menu Utama</p>
 
         <a href="{{ route('dashboard') }}"
