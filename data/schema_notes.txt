@@ -32,5 +32,25 @@ DATABASE TABLE RELATION NOTES
 - FK: career_id -> careers.career_id
 - FK: certification_id -> certifications.certification_id
 
-WEIGHT FORMULA:
+WEIGHT FORMULA (career profile vectors for CBF):
 weight = frequency / total_occurrence_of_career
+
+Interpretation:
+- Each career_*_weights table stores attribute importance per career (NOT global SAW weights).
+- Used to build career feature vectors in Content-Based Filtering.
+
+RECOMMENDATION PIPELINE:
+Input User Profile (education, specialization, skills, certification)
+  -> CBF: cosine_similarity(user_vector, career_vector) -> Top-15 candidates
+  -> SAW: benefit normalization r_ij = x_ij / max(x_j) on 4 criteria -> weighted sum
+  -> Final Top-10 recommendations (score scaled 0-100)
+
+SAW GLOBAL CRITERION WEIGHTS (sum = 1.0):
+- skills: 0.40
+- certification: 0.25
+- education: 0.20
+- specialization: 0.15
+
+DATA FLOW:
+it_career_dataset.csv -> generate_from_dataset.py -> CSV files -> Laravel seeders -> MySQL
+Runtime scoring: Laravel reads DB -> POST JSON payload -> Flask CBF+SAW service

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Career;
+use App\Support\RecommendationEngine;
 use App\Support\SkillCategoryGrouper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -35,9 +36,7 @@ class DashboardController extends Controller
         $searchResults = collect();
 
         if ($hasCriteria) {
-            $ranked = $this->normalizeScoresToPercentage(
-                $this->resolveRankedCareers($criteria)
-            );
+            $ranked = collect($this->resolveRankedCareers($criteria));
 
             if ($ranked->isNotEmpty()) {
                 $ids = $ranked->pluck('career_id')->all();
@@ -55,6 +54,30 @@ class DashboardController extends Controller
             }
         }
 
+        $sidebarCareers = $searchResults->isNotEmpty()
+            ? $searchResults
+            : Career::orderBy('career_name')->limit(7)->get();
+
+        $selectedCareerId = (int) $request->query(
+            'career_id',
+            $sidebarCareers->first()?->career_id ?? 0
+        );
+
+        if (! $sidebarCareers->contains('career_id', $selectedCareerId)) {
+            $selectedCareerId = $sidebarCareers->first()?->career_id ?? 0;
+        }
+
+        $careerProfiles = $sidebarCareers->map(function ($career) use ($searchResults) {
+            $score = $searchResults->isNotEmpty()
+                ? ($career->score ?? null)
+                : null;
+
+            return $this->buildCareerProfile($career, $score);
+        })->values();
+
+        $selectedProfile = $careerProfiles->firstWhere('career_id', $selectedCareerId)
+            ?? $careerProfiles->first();
+
         return view('dashboard', compact(
             'careers',
             'educations',
@@ -63,13 +86,114 @@ class DashboardController extends Controller
             'specializations',
             'certifications',
             'searchResults',
-            'criteria'
+            'criteria',
+            'sidebarCareers',
+            'selectedCareerId',
+            'careerProfiles',
+            'selectedProfile'
         ));
     }
 
-    private function resolveRankedCareers(array $criteria): Collection
+    private function buildCareerProfile(Career $career, ?float $score = null): array
     {
-        $careerPayloads = Career::with([
+        $topSkills = DB::table('career_skill_weights as csw')
+            ->join('skills as s', 's.skill_id', '=', 'csw.skill_id')
+            ->where('csw.career_id', $career->career_id)
+            ->orderByDesc('csw.weight')
+            ->limit(5)
+            ->pluck('s.skill_name')
+            ->all();
+
+        $educationAnalysis = DB::table('career_education_weights as cew')
+            ->join('educations as e', 'e.education_id', '=', 'cew.education_id')
+            ->where('cew.career_id', $career->career_id)
+            ->orderByDesc('cew.weight')
+            ->limit(3)
+            ->get(['e.education_level as label', 'cew.weight']);
+
+        $specializationBars = DB::table('career_specialization_weights as csw')
+            ->join('specializations as s', 's.specialization_id', '=', 'csw.specialization_id')
+            ->where('csw.career_id', $career->career_id)
+            ->orderByDesc('csw.weight')
+            ->limit(5)
+            ->get(['s.specialization_name as label', 'csw.weight']);
+
+        return [
+            'career_id' => $career->career_id,
+            'name' => $career->career_name,
+            'description' => $this->careerDescription($career->career_name),
+            'score' => $score,
+            'top_skills' => $topSkills,
+            'education_analysis' => $educationAnalysis,
+            'specialization_bars' => $specializationBars,
+        ];
+    }
+
+    private function careerDescription(string $name): string
+    {
+        $descriptions = [
+            'Software Engineer' => 'Merancang, mengembangkan, dan memelihara sistem perangkat lunak kompleks menggunakan berbagai bahasa pemrograman dan arsitektur modern.',
+            'Data Analyst' => 'Menganalisis data untuk menghasilkan insight bisnis yang actionable melalui visualisasi dan laporan strategis.',
+            'Data Scientist' => 'Membangun model prediktif dan algoritma machine learning untuk memecahkan masalah bisnis yang kompleks.',
+            'UI/UX Designer' => 'Merancang antarmuka pengguna yang intuitif dan pengalaman digital yang menyenangkan berdasarkan riset pengguna.',
+            'ML Engineer' => 'Mengimplementasikan, men-deploy, dan memelihara model machine learning di lingkungan produksi skala besar.',
+            'Machine Learning Engineer' => 'Mengimplementasikan, men-deploy, dan memelihara model machine learning di lingkungan produksi skala besar.',
+            'Cybersecurity Analyst' => 'Melindungi sistem dan jaringan dari ancaman siber melalui analisis keamanan, penetration testing, dan incident response.',
+            'Cloud Engineer' => 'Merancang dan mengelola infrastruktur cloud yang skalabel, aman, dan hemat biaya untuk mendukung aplikasi modern.',
+        ];
+
+        return $descriptions[$name] ?? "Menjelajahi peran {$name} berdasarkan kebutuhan skill, spesialisasi, pendidikan, dan sertifikasi di industri IT.";
+    }
+
+    private function resolveRankedCareers(array $criteria): array
+    {
+        $careerPayloads = $this->buildCareerPayloads();
+
+        try {
+            $response = (new FlaskController())->getResult([
+                'careers' => $careerPayloads,
+                'criteria' => $criteria,
+            ]);
+
+            if ($response->successful()) {
+                $ranked = collect($response->json('ranked', []))
+                    ->filter(fn ($item) => isset($item['career_id'], $item['score']));
+
+                if ($ranked->isNotEmpty()) {
+                    return $ranked
+                        ->filter(fn ($item) => ($item['score'] ?? 0) > 0)
+                        ->sortByDesc('score')
+                        ->values()
+                        ->take(10)
+                        ->all();
+                }
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return $this->calculateRankedCareersLocally($careerPayloads, $criteria)->all();
+    }
+
+    public function getRecommendation(Request $request)
+    {
+        return redirect()->route('dashboard', $request->query());
+    }
+
+    private function calculateRankedCareersLocally(array $careerPayloads, array $criteria): Collection
+    {
+        $ranked = RecommendationEngine::recommend($careerPayloads, $criteria);
+
+        return collect($ranked)
+            ->filter(fn ($item) => ($item['score'] ?? 0) > 0)
+            ->sortByDesc('score')
+            ->values()
+            ->take(10);
+    }
+
+    private function buildCareerPayloads(): array
+    {
+        return Career::with([
             'educationWeights',
             'skillWeights',
             'specializationWeights',
@@ -102,82 +226,5 @@ class DashboardController extends Controller
                     ])->toArray(),
                 ];
             })->toArray();
-
-        try {
-            $response = (new FlaskController())->getResult([
-                'careers' => $careerPayloads,
-                'criteria' => $criteria,
-            ]);
-
-            if ($response->successful()) {
-                $ranked = collect($response->json('ranked', []))
-                    ->filter(fn ($item) => isset($item['career_id'], $item['score']));
-
-                if ($ranked->isNotEmpty()) {
-                    return $ranked
-                        ->filter(fn ($item) => ($item['score'] ?? 0) > 0)
-                        ->sortByDesc('score')
-                        ->values()
-                        ->take(10);
-                }
-            }
-        } catch (\Throwable $e) {
-            report($e);
-        }
-
-        return $this->calculateRankedCareersLocally($criteria);
-    }
-
-    private function normalizeScoresToPercentage(Collection $ranked): Collection
-    {
-        $maxScore = $ranked->max('score') ?? 0;
-
-        if ($maxScore <= 0) {
-            return $ranked;
-        }
-
-        return $ranked->map(fn ($item) => [
-            'career_id' => $item['career_id'],
-            'score' => round(($item['score'] / $maxScore) * 100, 2),
-        ])->values();
-    }
-
-    private function calculateRankedCareersLocally(array $criteria): Collection
-    {
-        $scores = [];
-
-        if (! empty($criteria['education_id'])) {
-            foreach (DB::table('career_education_weights')->where('education_id', $criteria['education_id'])->get() as $row) {
-                $scores[$row->career_id] = ($scores[$row->career_id] ?? 0) + floatval($row->weight);
-            }
-        }
-
-        if (! empty($criteria['skill_ids'])) {
-            foreach (DB::table('career_skill_weights')->whereIn('skill_id', $criteria['skill_ids'])->get() as $row) {
-                $scores[$row->career_id] = ($scores[$row->career_id] ?? 0) + floatval($row->weight);
-            }
-        }
-
-        if (! empty($criteria['specialization_ids'])) {
-            foreach (DB::table('career_specialization_weights')->whereIn('specialization_id', $criteria['specialization_ids'])->get() as $row) {
-                $scores[$row->career_id] = ($scores[$row->career_id] ?? 0) + floatval($row->weight);
-            }
-        }
-
-        if (! empty($criteria['certification_id'])) {
-            foreach (DB::table('career_certification_weights')->where('certification_id', $criteria['certification_id'])->get() as $row) {
-                $scores[$row->career_id] = ($scores[$row->career_id] ?? 0) + floatval($row->weight);
-            }
-        }
-
-        return collect($scores)
-            ->map(fn ($score, $careerId) => [
-                'career_id' => (int) $careerId,
-                'score' => round($score, 6),
-            ])
-            ->filter(fn ($item) => $item['score'] > 0)
-            ->sortByDesc('score')
-            ->values()
-            ->take(10);
     }
 }
