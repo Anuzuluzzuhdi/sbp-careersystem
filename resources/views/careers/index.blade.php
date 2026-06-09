@@ -6,12 +6,40 @@
         :root {
             --blue:#1A2B6B; --blue-dark:#0D1B4B; --blue-light:#EEF1FB;
             --blue-mid:#C7D0EE; --ink:#111827; --body:#374151;
-            --muted:#6B7280; --border:#E5E7EB; --bg:#F5F7FA;
+            --muted:#6B7280; --border:#E5E7EB; --bg:#F0F4F8;
             --orange:#F5A524; --orange-dark:#D98D0F;
+            --glass-border: rgba(255, 255, 255, 0.6);
         }
+
+        /* ===== BACKGROUND MESH ===== */
+        .main-workspace {
+            position: relative;
+            z-index: 1;
+            background-color: var(--bg);
+        }
+        .main-workspace::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 70% 70% at 85% 5%, rgba(79, 70, 229, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 60% at 15% 85%, rgba(245, 165, 36, 0.08) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ===== GLASS CARD ===== */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(26, 43, 107, 0.04), inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+
         .sidebar-link {
             display:flex; align-items:center; gap:0.75rem;
-            padding:0.65rem 0.85rem; border-radius:0.5rem;
+            padding:0.75rem 1rem; border-radius:0.75rem;
             font-weight:600; font-size:0.875rem; color:var(--body);
             transition:all 0.2s; border-left:3px solid transparent;
             text-decoration:none;
@@ -21,7 +49,7 @@
         #sidebar.desktop-collapsed { width:0 !important; overflow:hidden; border-right:none; }
     </style>
 
-    <div class="font-jakarta flex flex-col min-h-screen bg-[#F5F7FA]">
+    <div class="font-jakarta flex flex-col min-h-screen">
 
         {{-- HEADER --}}
         <header class="font-jakarta sticky top-0 z-50 flex items-center justify-between px-4 sm:px-6 h-16 bg-white border-b border-[#E5E7EB] shadow-sm shrink-0">
@@ -58,21 +86,24 @@
         <div class="flex flex-1">
             @include('partials.sidebar')
 
-            <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-8 py-10 min-w-0">
+            <main class="main-workspace flex-1 w-full px-6 sm:px-10 lg:px-12 pt-8 pb-16 space-y-10 min-w-0">
 
-                <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {{-- PAGE HEADER --}}
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 relative z-10">
                     <div>
-                        <div class="inline-flex items-center gap-1.5 bg-[#EEF1FB] text-[#1A2B6B] text-[0.72rem] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-[#C7D0EE] mb-3">
-                            ✦ Daftar Karir
+                        <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm text-[#1A2B6B] text-[0.75rem] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white mb-4 shadow-sm">
+                            <span class="text-[#F5A524]">💼</span> Ensiklopedia Industri
                         </div>
-                        <h2 class="text-2xl font-extrabold text-[#111827]">Eksplorasi Karir IT</h2>
-                        <p class="mt-1 text-sm text-[#6B7280]">Temukan detail setiap peran dan skill yang dibutuhkan di industri.</p>
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-[#111827] tracking-tight leading-tight">
+                            Eksplorasi <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#1A2B6B] to-[#4F46E5]">Katalog Karir IT</span>
+                        </h2>
+                        <p class="mt-2 text-[0.95rem] text-[#6B7280] max-w-xl leading-relaxed font-medium">Temukan detail deskripsi, beban tanggung jawab, serta benchmark pendapatan setiap profesi.</p>
                     </div>
                     <a href="{{ route('analysis.form') }}"
-                       class="inline-flex items-center gap-2 bg-[#F5A524] hover:bg-[#D98D0F] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shrink-0">
-                        Analisis Karir Saya
+                       class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#F5A524] to-[#D98D0F] hover:shadow-lg hover:shadow-orange-500/20 text-white px-7 py-3.5 rounded-xl text-[0.9rem] font-bold transition-all shrink-0 hover:-translate-y-1 duration-300 border-none">
+                        Analisis Kesesuaian Karirku
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
                     </a>
                 </div>
@@ -135,52 +166,70 @@
                         $defaultDetail = ['desc' => 'Menganalisis, mengembangkan, dan memelihara sistem teknologi informasi perusahaan.', 'jobdesk' => 'Menyelesaikan permasalahan teknis dan berkolaborasi dengan tim lintas divisi.', 'salary' => 'Rp 8.000.000 - Rp 15.000.000'];
                     @endphp
 
-                    {{-- TAMBAHAN items-start AGAR KOTAK TIDAK IKUT MELAR --}}
-                    <div class="grid gap-5 lg:grid-cols-3 md:grid-cols-2 items-start">
+                    {{-- CAREER GRID --}}
+                    <div class="grid gap-6 lg:grid-cols-3 md:grid-cols-2 items-start">
                         @foreach ($careers as $career)
-                            <div class="group bg-white rounded-2xl border border-[#E5E7EB] p-6 shadow-sm transition hover:-translate-y-1 hover:border-[#C7D0EE] hover:shadow-md relative overflow-hidden flex flex-col">
-                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1A2B6B] to-[#F5A524] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            @php $detail = $dummyDetails[$career->career_name] ?? $defaultDetail; @endphp
+
+                            <div class="relative glass-card p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-200 hover:shadow-[0_20px_40px_rgba(26,43,107,0.06)] group overflow-hidden flex flex-col h-full">
+                                {{-- Top gradient bar --}}
+                                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#1A2B6B] to-[#F5A524] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                                {{-- Card header --}}
                                 <div class="flex items-start justify-between gap-3 mb-4">
-                                    <div class="w-10 h-10 rounded-xl bg-[#EEF1FB] flex items-center justify-center text-lg shrink-0">💻</div>
-                                    <span class="text-[0.68rem] font-bold uppercase tracking-wider text-[#6B7280] bg-[#F5F7FA] border border-[#E5E7EB] px-2 py-0.5 rounded-full">
-                                        IT Career
+                                    <div class="w-12 h-12 rounded-xl bg-[#EEF1FB] flex items-center justify-center text-xl shrink-0 border border-[#C7D0EE] group-hover:scale-110 group-hover:bg-[#1A2B6B] group-hover:text-white transition-all duration-300 shadow-sm">💻</div>
+                                    <span class="inline-flex items-center gap-1 text-[0.7rem] font-extrabold uppercase tracking-wider text-[#1A2B6B] bg-white border border-[#C7D0EE]/60 px-3 py-1.5 rounded-xl shadow-sm">
+                                        Karir IT
                                     </span>
                                 </div>
-                                <h3 class="text-base font-bold text-[#111827] mb-2">{{ $career->career_name }}</h3>
-                                
-                                @php $detail = $dummyDetails[$career->career_name] ?? $defaultDetail; @endphp
 
-                                {{-- AKORDION DETAIL KARIR --}}
-                                <div class="mt-2 mb-4">
+                                <h3 class="text-xl font-extrabold text-[#111827] mb-4 leading-snug group-hover:text-[#1A2B6B] transition-colors min-h-[3.5rem] flex items-center">{{ $career->career_name }}</h3>
+
+                                {{-- Akordion detail --}}
+                                <div class="mt-auto space-y-4">
                                     <details class="group/detail">
-                                        <summary class="text-xs font-bold text-[#1A2B6B] cursor-pointer list-none flex justify-between items-center hover:text-[#F5A524] transition-colors bg-[#EEF1FB] px-3 py-2 rounded-lg border border-[#C7D0EE]">
-                                            <span>Lihat Detail Karir</span>
-                                            <svg class="w-4 h-4 transform group-open/detail:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                        <summary class="text-xs font-bold text-[#1A2B6B] cursor-pointer list-none flex justify-between items-center hover:text-[#F5A524] transition-colors bg-[#EEF1FB]/60 hover:bg-[#EEF1FB] px-3 py-2.5 rounded-xl border border-[#C7D0EE]/70">
+                                            <span>Lihat Informasi Detail</span>
+                                            <svg class="w-4 h-4 transform group-open/detail:rotate-180 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                                            </svg>
                                         </summary>
-                                        <div class="mt-3 space-y-3 text-xs text-[#374151] bg-[#F5F7FA] p-4 rounded-xl border border-[#E5E7EB] shadow-inner">
-                                            <div><div class="font-bold text-[#111827] flex items-center gap-1.5"><span class="text-sm">📝</span> Deskripsi:</div><p class="mt-1 leading-relaxed">{{ $detail['desc'] }}</p></div>
-                                            <div><div class="font-bold text-[#111827] flex items-center gap-1.5"><span class="text-sm">🎯</span> Jobdesk Utama:</div><p class="mt-1 leading-relaxed">{{ $detail['jobdesk'] }}</p></div>
-                                            <div><div class="font-bold text-[#111827] flex items-center gap-1.5"><span class="text-sm">💰</span> Estimasi Gaji:</div><p class="mt-1 font-extrabold text-emerald-600">{{ $detail['salary'] }}</p></div>
+                                        <div class="mt-3 space-y-3.5 text-xs text-[#374151] bg-white p-4 rounded-xl border border-gray-200 shadow-inner">
+                                            <div>
+                                                <div class="font-bold text-[#111827] flex items-center gap-1.5 text-[0.7rem] uppercase text-gray-400 tracking-wider">📝 Deskripsi Jabatan:</div>
+                                                <p class="mt-1 leading-relaxed text-gray-600 font-medium">{{ $detail['desc'] }}</p>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-[#111827] flex items-center gap-1.5 text-[0.7rem] uppercase text-gray-400 tracking-wider">🎯 Core Jobdesk:</div>
+                                                <p class="mt-1 leading-relaxed text-gray-600 font-medium">{{ $detail['jobdesk'] }}</p>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-[#111827] flex items-center gap-1.5 text-[0.7rem] uppercase text-gray-400 tracking-wider">💰 Estimasi Gaji Pokok:</div>
+                                                <p class="mt-1 font-extrabold text-emerald-600 text-sm tracking-wide">{{ $detail['salary'] }}</p>
+                                            </div>
                                         </div>
                                     </details>
-                                </div>
 
-                                <div class="mt-auto pt-4 border-t border-[#F5F7FA]">
-                                    <a href="{{ route('analysis.form') }}"
-                                       class="text-xs font-bold text-[#1A2B6B] hover:underline flex items-center gap-1 w-max">
-                                        Cek kecocokan saya
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                        </svg>
-                                    </a>
+                                    {{-- CTA bawah --}}
+                                    <div class="pt-3 border-t border-gray-100">
+                                        <a href="{{ route('analysis.form') }}"
+                                           class="text-xs font-bold text-[#1A2B6B] hover:text-[#F5A524] transition-colors flex items-center gap-1.5 w-max group/cta">
+                                            Cek kecocokan saya
+                                            <svg class="w-3.5 h-3.5 transform group-hover/cta:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 @else
-                    <div class="rounded-2xl border-2 border-dashed border-[#E5E7EB] bg-white p-10 text-center">
-                        <div class="w-16 h-16 mx-auto bg-[#F5F7FA] border border-[#E5E7EB] rounded-2xl flex items-center justify-center text-2xl mb-4">💼</div>
-                        <p class="font-bold text-[#111827]">Belum ada data karir</p>
+                    {{-- Empty state halaman kosong --}}
+                    <div class="rounded-[32px] border-2 border-dashed border-[#C7D0EE] bg-white/50 backdrop-blur p-12 text-center max-w-3xl mx-auto shadow-sm">
+                        <div class="w-20 h-20 mx-auto bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-3xl shadow-md mb-6">💼</div>
+                        <p class="font-extrabold text-[#111827] text-2xl tracking-tight">Katalog Karir Kosong</p>
+                        <p class="mt-3 text-[0.95rem] text-[#6B7280] max-w-md mx-auto leading-relaxed">Data referensi karir belum tersedia di database. Silakan hubungi administrator untuk melakukan sinkronisasi.</p>
                     </div>
                 @endif
 
