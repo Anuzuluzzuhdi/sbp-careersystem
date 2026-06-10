@@ -31,7 +31,7 @@ return new class extends Migration
             Schema::table($table, function (Blueprint $blueprint) {
                 // Placed after weight so the column order is logical when
                 // inspecting the schema. NULL = not yet set; fallback to weight.
-                $blueprint->decimal('saw_score', 6, 4)->nullable()->after('weight');
+                $blueprint->decimal('saw_score', 10, 4)->nullable()->after('weight');
             });
         }
     }

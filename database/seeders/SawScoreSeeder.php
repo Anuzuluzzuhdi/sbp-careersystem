@@ -52,7 +52,7 @@ class SawScoreSeeder extends Seeder
             // Raw SQL UPDATE — sets every row's saw_score to its frequency value.
             // DECIMAL(6,4) cast matches the column definition added by migration
             // 2026_06_10_000100_add_saw_score_to_career_weight_tables.php.
-            DB::statement("UPDATE `{$table}` SET `saw_score` = CAST(`frequency` AS DECIMAL(6, 4))");
+            DB::statement("UPDATE `{$table}` SET `saw_score` = CAST(`frequency` AS DECIMAL(10, 4))");
 
             // Count rows actually updated for console feedback.
             $total = DB::table($table)->count();
