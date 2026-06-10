@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Career;
+use App\Models\SawCriterionWeight;
 use App\Support\SkillCategoryGrouper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -56,9 +58,11 @@ class DashboardController extends Controller
         $searchResults = collect();
 
         if ($hasCriteria) {
-            $ranked = $this->normalizeScoresToPercentage(
-                $this->resolveRankedCareers($criteria)
-            );
+            // resolveRankedCareers() returns scores already on a 0–100 scale
+            // (both the Flask pipeline and the local SAW fallback). Do NOT pass
+            // through normalizeScoresToPercentage() — that would re-scale and
+            // collapse the top score to 100 a second time, distorting relative gaps.
+            $ranked = $this->resolveRankedCareers($criteria);
 
             if ($ranked->isNotEmpty()) {
                 $ids      = $ranked->pluck('career_id')->all();
@@ -135,6 +139,10 @@ class DashboardController extends Controller
 
     private function resolveRankedCareers(array $criteria): Collection
     {
+        // ── Build career payload ──────────────────────────────────────────────
+        // Each weight entry carries both `weight` (CBF role) and `saw_score`
+        // (SAW role). saw_score is null when not yet populated; Flask falls
+        // back to weight in that case (see preprocessing.py).
         $careerPayloads = Career::with([
             'educationWeights',
             'skillWeights',
@@ -145,30 +153,36 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($career) {
                 return [
-                    'career_id'              => $career->career_id,
-                    'educationWeights'       => $career->educationWeights->map(fn ($w) => [
+                    'career_id'             => $career->career_id,
+                    'educationWeights'      => $career->educationWeights->map(fn ($w) => [
                         'education_id' => $w->education_id,
+                        // CBF uses weight; SAW uses saw_score (null → fallback to weight)
                         'weight'       => floatval($w->weight),
+                        'saw_score'    => $w->saw_score !== null ? floatval($w->saw_score) : null,
                         'frequency'    => intval($w->frequency),
                     ])->toArray(),
-                    'skillWeights'           => $career->skillWeights->map(fn ($w) => [
+                    'skillWeights'          => $career->skillWeights->map(fn ($w) => [
                         'skill_id'  => $w->skill_id,
                         'weight'    => floatval($w->weight),
+                        'saw_score' => $w->saw_score !== null ? floatval($w->saw_score) : null,
                         'frequency' => intval($w->frequency),
                     ])->toArray(),
-                    'specializationWeights'  => $career->specializationWeights->map(fn ($w) => [
+                    'specializationWeights' => $career->specializationWeights->map(fn ($w) => [
                         'specialization_id' => $w->specialization_id,
                         'weight'            => floatval($w->weight),
+                        'saw_score'         => $w->saw_score !== null ? floatval($w->saw_score) : null,
                         'frequency'         => intval($w->frequency),
                     ])->toArray(),
-                    'certificationWeights'   => $career->certificationWeights->map(fn ($w) => [
+                    'certificationWeights'  => $career->certificationWeights->map(fn ($w) => [
                         'certification_id' => $w->certification_id,
                         'weight'           => floatval($w->weight),
+                        'saw_score'        => $w->saw_score !== null ? floatval($w->saw_score) : null,
                         'frequency'        => intval($w->frequency),
                     ])->toArray(),
                 ];
             })->toArray();
 
+        // ── Try Flask pipeline ────────────────────────────────────────────────
         try {
             $response = (new FlaskController())->getResult([
                 'careers'  => $careerPayloads,
@@ -189,8 +203,16 @@ class DashboardController extends Controller
             }
         } catch (\Throwable $e) {
             report($e);
+            Log::warning('Flask pipeline unavailable; using local SAW fallback.', [
+                'reason'     => $e->getMessage(),
+                'timestamp'  => now()->toIso8601String(),
+                'fallback'   => true,
+            ]);
         }
 
+        // ── Local SAW fallback ────────────────────────────────────────────────
+        // Produces scores on the same 0–100 scale as Flask. Do NOT pass the
+        // result through normalizeScoresToPercentage() — it is already normalised.
         return $this->calculateRankedCareersLocally($criteria);
     }
 
@@ -210,40 +232,128 @@ class DashboardController extends Controller
 
     private function calculateRankedCareersLocally(array $criteria): Collection
     {
-        $scores = [];
+        // ── Load SAW global-criterion weights ─────────────────────────────────
+        // Reads from saw_criterion_weights table; falls back to hardcoded
+        // defaults (matching Flask's SAW_WEIGHTS) when the table is empty.
+        $criterionWeights = SawCriterionWeight::activeWeights();
+
+        // ── Step 1: compute raw per-criterion scores for every career ─────────
+        // SAW uses saw_score when non-null; falls back to weight otherwise.
+        // This mirrors criterion_scores_for_career() in Flask's preprocessing.py.
+        $educationRows       = [];
+        $skillRows           = [];
+        $specializationRows  = [];
+        $certificationRows   = [];
 
         if (! empty($criteria['education_id'])) {
-            foreach (DB::table('career_education_weights')
-                ->where('education_id', $criteria['education_id'])->get() as $row) {
-                $scores[$row->career_id] = ($scores[$row->career_id] ?? 0) + floatval($row->weight);
-            }
+            $educationRows = DB::table('career_education_weights')
+                ->where('education_id', $criteria['education_id'])
+                ->get(['career_id', 'weight', 'saw_score'])
+                ->keyBy('career_id')
+                ->toArray();
         }
 
         if (! empty($criteria['skill_ids'])) {
             foreach (DB::table('career_skill_weights')
-                ->whereIn('skill_id', $criteria['skill_ids'])->get() as $row) {
-                $scores[$row->career_id] = ($scores[$row->career_id] ?? 0) + floatval($row->weight);
+                ->whereIn('skill_id', $criteria['skill_ids'])
+                ->get(['career_id', 'weight', 'saw_score']) as $row) {
+                $val = $row->saw_score !== null ? floatval($row->saw_score) : floatval($row->weight);
+                $skillRows[$row->career_id] = ($skillRows[$row->career_id] ?? 0.0) + $val;
             }
         }
 
         if (! empty($criteria['specialization_ids'])) {
             foreach (DB::table('career_specialization_weights')
-                ->whereIn('specialization_id', $criteria['specialization_ids'])->get() as $row) {
-                $scores[$row->career_id] = ($scores[$row->career_id] ?? 0) + floatval($row->weight);
+                ->whereIn('specialization_id', $criteria['specialization_ids'])
+                ->get(['career_id', 'weight', 'saw_score']) as $row) {
+                $val = $row->saw_score !== null ? floatval($row->saw_score) : floatval($row->weight);
+                $specializationRows[$row->career_id] = ($specializationRows[$row->career_id] ?? 0.0) + $val;
             }
         }
 
         if (! empty($criteria['certification_id'])) {
-            foreach (DB::table('career_certification_weights')
-                ->where('certification_id', $criteria['certification_id'])->get() as $row) {
-                $scores[$row->career_id] = ($scores[$row->career_id] ?? 0) + floatval($row->weight);
-            }
+            $certificationRows = DB::table('career_certification_weights')
+                ->where('certification_id', $criteria['certification_id'])
+                ->get(['career_id', 'weight', 'saw_score'])
+                ->keyBy('career_id')
+                ->toArray();
         }
 
-        return collect($scores)
-            ->map(fn ($score, $careerId) => [
+        // ── Step 2: collect all career IDs that appear in any criterion ───────
+        $allCareerIds = collect()
+            ->merge(array_keys($educationRows))
+            ->merge(array_keys($skillRows))
+            ->merge(array_keys($specializationRows))
+            ->merge(array_keys($certificationRows))
+            ->unique()
+            ->all();
+
+        if (empty($allCareerIds)) {
+            return collect();
+        }
+
+        // ── Step 3: build raw decision matrix (one row per career) ────────────
+        $rawMatrix = [];
+        foreach ($allCareerIds as $careerId) {
+            $eduRow  = $educationRows[$careerId]      ?? null;
+            $certRow = $certificationRows[$careerId]  ?? null;
+
+            $rawMatrix[$careerId] = [
+                // Single-match criteria: use saw_score if present, else weight
+                'education'      => $eduRow
+                    ? ($eduRow->saw_score !== null ? floatval($eduRow->saw_score) : floatval($eduRow->weight))
+                    : 0.0,
+                'certification'  => $certRow
+                    ? ($certRow->saw_score !== null ? floatval($certRow->saw_score) : floatval($certRow->weight))
+                    : 0.0,
+                // Multi-match criteria: already summed above
+                'skills'         => $skillRows[$careerId]         ?? 0.0,
+                'specialization' => $specializationRows[$careerId] ?? 0.0,
+            ];
+        }
+
+        // ── Step 4: benefit normalisation r_ij = x_ij / max(x_j) ────────────
+        // Mirrors normalize_benefit_matrix() in Flask's saw.py.
+        $criterionOrder = ['skills', 'certification', 'education', 'specialization'];
+        $columnMax = [];
+        foreach ($criterionOrder as $criterion) {
+            $columnMax[$criterion] = max(array_column($rawMatrix, $criterion) ?: [0.0]);
+        }
+
+        $normalised = [];
+        foreach ($rawMatrix as $careerId => $row) {
+            $normRow = [];
+            foreach ($criterionOrder as $criterion) {
+                $normRow[$criterion] = $columnMax[$criterion] > 0
+                    ? $row[$criterion] / $columnMax[$criterion]
+                    : 0.0;
+            }
+            $normalised[$careerId] = $normRow;
+        }
+
+        // ── Step 5: weighted sum (SAW score) ──────────────────────────────────
+        $sawScores = [];
+        foreach ($normalised as $careerId => $normRow) {
+            $score = 0.0;
+            foreach ($criterionOrder as $criterion) {
+                $w = $criterionWeights[$criterion] ?? 0.0;
+                $score += $w * $normRow[$criterion];
+            }
+            $sawScores[$careerId] = $score;
+        }
+
+        // ── Step 6: max-scale to 0–100 ───────────────────────────────────────
+        // Mirrors the final step in rank_candidates_with_saw() in Flask's saw.py.
+        $maxSaw = max($sawScores ?: [0.0]);
+
+        if ($maxSaw <= 0) {
+            return collect();
+        }
+
+        return collect($sawScores)
+            ->map(fn ($sawScore, $careerId) => [
                 'career_id' => (int) $careerId,
-                'score'     => round($score, 6),
+                'score'     => round(($sawScore / $maxSaw) * 100, 2),
             ])
             ->filter(fn ($item) => $item['score'] > 0)
             ->sortByDesc('score')

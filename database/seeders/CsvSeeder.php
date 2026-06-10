@@ -14,18 +14,24 @@ abstract class CsvSeeder extends Seeder
             return;
         }
 
+        // Map CSV columns to DB columns for every row first
+        $mapped = [];
         foreach ($rows as $row) {
-            $insert = [];
-
             if ($columnMap === []) {
-                $insert = $row;
+                $mapped[] = $row;
             } else {
+                $insert = [];
                 foreach ($columnMap as $csvKey => $columnName) {
                     $insert[$columnName] = $row[$csvKey] ?? null;
                 }
+                $mapped[] = $insert;
             }
+        }
 
-            DB::table($table)->insert($insert);
+        // Bulk insert in chunks of 500 rows per query instead of one query
+        // per row. Reduces ~5800 individual INSERT round-trips to ~12.
+        foreach (array_chunk($mapped, 500) as $chunk) {
+            DB::table($table)->insert($chunk);
         }
     }
 

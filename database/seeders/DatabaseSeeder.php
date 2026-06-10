@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             CareerSpecializationWeightsTableSeeder::class,
             CareerSkillWeightsTableSeeder::class,
             CareerCertificationWeightsTableSeeder::class,
+            SawScoreSeeder::class,           // must run after weight seeders; reads frequency column
+            SawCriterionWeightsSeeder::class,
         ]);
 
         User::factory()->create([
