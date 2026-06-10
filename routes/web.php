@@ -44,14 +44,17 @@ Route::get('/jalankan-migrasi-rahasia', function () {
     }
 });
 
-Route::get('/jalankan-seeder-rahasia', function () {
+Route::get('/bersihkan-dan-isi-database', function () {
     try {
-        // Menyuruh Laravel mengisi data master otomatis ke database Aiven
-        Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        // Menghapus semua tabel, membuat ulang, dan langsung mengisi seeder secara bersih
+        Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
+            '--seed' => true,
+            '--force' => true
+        ]);
         
-        return '<h1>Sihir Pengisian Data Berhasil! 🚀</h1><pre>' . Illuminate\Support\Facades\Artisan::output() . '</pre>';
+        return '<h1>Sihir Total Berhasil! 🌟</h1><pre>' . Illuminate\Support\Facades\Artisan::output() . '</pre>';
     } catch (\Exception $e) {
-        return '<h1>Waduh Gagal mengisi data:</h1><pre>' . $e->getMessage() . '</pre>';
+        return '<h1>Waduh Gagal total:</h1><pre>' . $e->getMessage() . '</pre>';
     }
 });
 
