@@ -46,15 +46,19 @@ Route::get('/jalankan-migrasi-rahasia', function () {
 
 Route::get('/bersihkan-dan-isi-database', function () {
     try {
-        // Menghapus semua tabel, membuat ulang, dan langsung mengisi seeder secara bersih
+        // 1. Paksa server agar tidak timeout (diberi waktu sampai 5 menit)
+        set_time_limit(300);
+
+        // 2. Jalankan ulang pembersihan dan pengisian data
         Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
             '--seed' => true,
             '--force' => true
         ]);
         
         return '<h1>Sihir Total Berhasil! 🌟</h1><pre>' . Illuminate\Support\Facades\Artisan::output() . '</pre>';
-    } catch (\Exception $e) {
-        return '<h1>Waduh Gagal total:</h1><pre>' . $e->getMessage() . '</pre>';
+    } catch (\Throwable $e) { 
+        // 3. Menggunakan \Throwable agar eror sekecil apa pun PASTI KETANGKAP dan muncul di layar
+        return '<h1>Waduh Gagal total, Ini Detail Erornya:</h1><pre>' . $e->getMessage() . '</pre>';
     }
 });
 
